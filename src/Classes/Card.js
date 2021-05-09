@@ -6,6 +6,7 @@ import orange from "../Utilities/Railway_Carrrige_Cards/orange.png"
 import green from "../Utilities/Railway_Carrrige_Cards/green.png"
 import blue from "../Utilities/Railway_Carrrige_Cards/blue.png"
 import black from "../Utilities/Railway_Carrrige_Cards/black.png"
+import locomotive from "../Utilities/Railway_Carrrige_Cards/locomotive.png"
 
 class Card { 
     constructor(type) {
@@ -18,6 +19,7 @@ class Card {
         else if(this.type===5)       this.image = <img src={green} height="90" width="200" alt="Zold vasútkocsi"></img>
         else if(this.type===6)       this.image = <img src={blue} height="90" width="200" alt="Kék vasútkocsi"></img>
         else if(this.type===7)       this.image = <img src={black} height="90" width="200" alt="Fekete vasútkocsi"></img>
+        else if(this.type===8)       this.image = <img src={locomotive} height="90" width="200" alt="Mozdony"></img>
     }
 }
 

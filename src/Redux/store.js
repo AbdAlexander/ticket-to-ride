@@ -2,10 +2,18 @@ import { applyMiddleware, combineReducers, createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { createLogger } from "redux-logger";
 import thunk from "redux-thunk";
-import testReducer from "./Reducers/testReducer";
+
+import cardsReducer from "./Reducers/cardsReducer";
+import gamedataReducer from "./Reducers/gamedataReducer";
+import playerReducer from "./Reducers/playerReducer";
+import gamestateReducer from "./Reducers/gamestateReducer";
 
 const reducers = combineReducers({
-    test: testReducer
+    gamestate: gamestateReducer,
+    gamedata: gamedataReducer,
+    players: playerReducer,
+    cards: cardsReducer,
+
 });
 const logger = createLogger({ collapsed: true  });
 

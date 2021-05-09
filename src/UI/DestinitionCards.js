@@ -1,18 +1,9 @@
-import destinations from "../Utilities/Images/destinations.png"
-
 const DestinationCards = () => {
-    const destinationCardsStyle = {
-
-    }
-    
-
     return (
         <div>
-            <h6>Célkártyák paklija</h6>
-            <img src={destinations} style={{mixBlendMode: "darken", opacity:'07', height:125}} alt="Menetjegyek kártyapaklija"></img>
+            <h6><strong>Célkártyák paklija</strong></h6>
+            <img src="https://static.thenounproject.com/png/219525-200.png" height="160" width="200" alt=""/>
         </div>
     )
 }
 export default DestinationCards;
-
-//<img src={destinations} style={{opacity:0.5, zIndex:'-0.5', position:'relative'}} alt="Menetjegyek kártyapaklija"></img>

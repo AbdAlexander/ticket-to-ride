@@ -1,7 +1,7 @@
 
 const Player = (props) => {
     let userData = props;
-    let cards = {};
+    //let cards = {};
 
     const isSelected = userData.isSelected === "true" ? true : false;
     const playerBackgroundColor = isSelected ? '#FF8D3E' : '#FFC13E';
