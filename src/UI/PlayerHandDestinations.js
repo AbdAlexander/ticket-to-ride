@@ -1,13 +1,16 @@
-const PlayerHandDestinations = () => {
+const PlayerHandDestinations = (props) => {
+    const long = props.longD;
+    const normal = props.normalD;
     
     return (
         <div>
             <ul>
-                <li>Cél 1</li>
-                <li>Cél 2</li>
-                <li>Cél 3</li>
-                <li>Cél 4</li>
-                <li>Cél 5</li>
+                <li><strong>Hosszú: </strong>{long[0]?.fromCity} - {long[0]?.toCity} ({long[0]?.value}) [<strong> {long[0]?.done ? "Teljesítve" : "Teljesítetlen"} </strong>]</li>
+                {normal.map((d,i) =>
+                    <li key={i}>
+                        <strong>Rövid: </strong> {d.fromCity} - {d.toCity} ({d.value})  [<strong> {d.done ? "Teljesítve" : "Teljesítetlen"} </strong>]
+                    </li>)
+                }
             </ul>
         </div>
     )

@@ -22,10 +22,11 @@ const shuffleCards = () => {
 
 setCards();
 shuffleCards();
-const initalState = {cardsStorage: storage};
 
+
+const initalState = {cardsStorage: storage};
 const cardsReducer = (state = initalState, action) => { 
-    let copyState = Object.assign({}, state);
+    //let copyState = Object.assign({}, state);
 
     return state;
 };

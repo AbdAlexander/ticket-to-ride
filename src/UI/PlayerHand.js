@@ -1,9 +1,18 @@
 import { Col, Row } from "react-bootstrap"
+import { useSelector } from "react-redux";
 import PlayerHandDestinations from "./PlayerHandDestinations"
 
-const PlayerHand = () => {
+const PlayerHand = (props) => {
+    const players = useSelector((state) => state.players);
+    const gamestate = useSelector((state) => state.gamestate);
+
+    let actualPlayer = players.player1;
+    if(gamestate.state !== "INITAL") {
+        actualPlayer = players.player1.isSelected ? players.player1 : players.player2;
+    }
+
     const handStyle = {
-        height:180,
+        height:190,
         width:1050,
         backgroundColor: "#FF8D3E", 
         borderRadius:50,
@@ -15,10 +24,16 @@ const PlayerHand = () => {
 
     return (
         <div style={handStyle}>
-            <h3 style={handDataStyle}>Gabi asztala</h3>
-            <Row>
-                <Col style={{paddingLeft: 25}}> <PlayerHandDestinations/> </Col>
-                <Col style={{paddingRight: 700}}>Vasútkocsikártyák</Col>
+            <h3 style={handDataStyle}>{actualPlayer.name} asztala</h3>
+            <Row style={{width:'100%', height:'100%'}}>
+                <Col style={{paddingLeft: 25}}> <PlayerHandDestinations longD={actualPlayer.longDestinations} normalD={actualPlayer.normalDestinations}/> </Col>
+                <Col style={{}}>
+                    {/*<table style={{}}>
+                        <tr style={{}}>
+                            {actualPlayer.cards.map((c,i) => <th style={{}}>{c.image}</th>)}  
+                        </tr>
+                    </table>*/}
+                </Col>
             </Row>
         </div>
     )

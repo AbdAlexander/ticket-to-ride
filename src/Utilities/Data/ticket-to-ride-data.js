@@ -1461,6 +1461,7 @@ export const ticketToRideData = {
       "fromCity": "Athina",
       "toCity": "Angora",
       "value": "5",
+      "done": false,
     },
     "2": {
       "id": "2",
@@ -1469,6 +1470,7 @@ export const ticketToRideData = {
       "fromCity": "Budapest",
       "toCity": "Sofia",
       "value": "5",
+      "done": false,
     },
     "3": {
       "id": "3",
@@ -1477,6 +1479,7 @@ export const ticketToRideData = {
       "fromCity": "Frankfurt",
       "toCity": "Kobenhavn",
       "value": "5",
+      "done": false,
     },
     "4": {
       "id": "4",
@@ -1485,6 +1488,7 @@ export const ticketToRideData = {
       "fromCity": "Rostov",
       "toCity": "Erzurum",
       "value": "5",
+      "done": false,
     },
     "5": {
       "id": "5",
@@ -1493,6 +1497,7 @@ export const ticketToRideData = {
       "fromCity": "Sofia",
       "toCity": "Smyrna",
       "value": "5",
+      "done": false,
     },
     "6": {
       "id": "6",
@@ -1501,6 +1506,7 @@ export const ticketToRideData = {
       "fromCity": "Kyiv",
       "toCity": "Petrograd",
       "value": "6",
+      "done": false,
     },
     "7": {
       "id": "7",
@@ -1509,6 +1515,7 @@ export const ticketToRideData = {
       "fromCity": "Zurich",
       "toCity": "Brindisi",
       "value": "6",
+      "done": false,
     },
     "8": {
       "id": "8",
@@ -1517,6 +1524,7 @@ export const ticketToRideData = {
       "fromCity": "Zurich",
       "toCity": "Budapest",
       "value": "6",
+      "done": false,
     },
     "9": {
       "id": "9",
@@ -1525,6 +1533,7 @@ export const ticketToRideData = {
       "fromCity": "Warszawa",
       "toCity": "Smolensk",
       "value": "6",
+      "done": false,
     },
     "10": {
       "id": "10",
@@ -1533,6 +1542,7 @@ export const ticketToRideData = {
       "fromCity": "Zagrab",
       "toCity": "Brindisi",
       "value": "6",
+      "done": false,
     },
     "11": {
       "id": "11",
@@ -1541,6 +1551,7 @@ export const ticketToRideData = {
       "fromCity": "Paris",
       "toCity": "Zagrab",
       "value": "7",
+      "done": false,
     },
     "12": {
       "id": "12",
@@ -1549,6 +1560,7 @@ export const ticketToRideData = {
       "fromCity": "Brest",
       "toCity": "Marseille",
       "value": "7",
+      "done": false,
     },
     "13": {
       "id": "13",
@@ -1557,6 +1569,7 @@ export const ticketToRideData = {
       "fromCity": "London",
       "toCity": "Berlin",
       "value": "7",
+      "done": false,
     },
     "14": {
       "id": "14",
@@ -1565,6 +1578,7 @@ export const ticketToRideData = {
       "fromCity": "Edinburgh",
       "toCity": "Paris",
       "value": "7",
+      "done": false,
     },
     "15": {
       "id": "15",
@@ -1573,6 +1587,7 @@ export const ticketToRideData = {
       "fromCity": "Amsterdam",
       "toCity": "Pamplona",
       "value": "7",
+      "done": false,
     },
     "16": {
       "id": "16",
@@ -1581,6 +1596,7 @@ export const ticketToRideData = {
       "fromCity": "Roma",
       "toCity": "Smyrna",
       "value": "8",
+      "done": false,
     },
     "17": {
       "id": "17",
@@ -1589,6 +1605,7 @@ export const ticketToRideData = {
       "fromCity": "Palermo",
       "toCity": "Constantinople",
       "value": "8",
+      "done": false,
     },
     "18": {
       "id": "18",
@@ -1597,6 +1614,7 @@ export const ticketToRideData = {
       "fromCity": "Sarajevo",
       "toCity": "Sevastopol",
       "value": "8",
+      "done": false,
     },
     "19": {
       "id": "19",
@@ -1605,6 +1623,7 @@ export const ticketToRideData = {
       "fromCity": "Madrid",
       "toCity": "Dieppe",
       "value": "8",
+      "done": false,
     },
     "20": {
       "id": "20",
@@ -1613,6 +1632,7 @@ export const ticketToRideData = {
       "fromCity": "Barcelona",
       "toCity": "Bruxelles",
       "value": "8",
+      "done": false,
     },
     "21": {
       "id": "21",
@@ -1621,6 +1641,7 @@ export const ticketToRideData = {
       "fromCity": "Paris",
       "toCity": "Wien",
       "value": "8",
+      "done": false,
     },
     "22": {
       "id": "22",
@@ -1629,6 +1650,7 @@ export const ticketToRideData = {
       "fromCity": "Barcelona",
       "toCity": "Munchen",
       "value": "8",
+      "done": false,
     },
     "23": {
       "id": "23",
@@ -1637,6 +1659,7 @@ export const ticketToRideData = {
       "fromCity": "Brest",
       "toCity": "Venezia",
       "value": "8",
+      "done": false,
     },
     "24": {
       "id": "24",
@@ -1645,6 +1668,7 @@ export const ticketToRideData = {
       "fromCity": "Smolensk",
       "toCity": "Rostov",
       "value": "8",
+      "done": false,
     },
     "25": {
       "id": "25",
@@ -1653,6 +1677,7 @@ export const ticketToRideData = {
       "fromCity": "Marseille",
       "toCity": "Essen",
       "value": "8",
+      "done": false,
     },
     "26": {
       "id": "26",
@@ -1661,6 +1686,7 @@ export const ticketToRideData = {
       "fromCity": "Kyiv",
       "toCity": "Sochi",
       "value": "8",
+      "done": false,
     },
     "27": {
       "id": "27",
@@ -1669,6 +1695,7 @@ export const ticketToRideData = {
       "fromCity": "Madrid",
       "toCity": "Zurich",
       "value": "8",
+      "done": false,
     },
     "28": {
       "id": "28",
@@ -1677,6 +1704,7 @@ export const ticketToRideData = {
       "fromCity": "Berlin",
       "toCity": "Bucuresti",
       "value": "8",
+      "done": false,
     },
     "29": {
       "id": "29",
@@ -1685,6 +1713,7 @@ export const ticketToRideData = {
       "fromCity": "Bruxelles",
       "toCity": "Danzig",
       "value": "9",
+      "done": false,
     },
     "30": {
       "id": "30",
@@ -1693,6 +1722,7 @@ export const ticketToRideData = {
       "fromCity": "Berlin",
       "toCity": "Roma",
       "value": "9",
+      "done": false,
     },
     "31": {
       "id": "31",
@@ -1701,6 +1731,7 @@ export const ticketToRideData = {
       "fromCity": "Angora",
       "toCity": "Kharkov",
       "value": "10",
+      "done": false,
     },
     "32": {
       "id": "32",
@@ -1709,6 +1740,7 @@ export const ticketToRideData = {
       "fromCity": "Riga",
       "toCity": "Bucuresti",
       "value": "10",
+      "done": false,
     },
     "33": {
       "id": "33",
@@ -1717,6 +1749,7 @@ export const ticketToRideData = {
       "fromCity": "Essen",
       "toCity": "Kyiv",
       "value": "10",
+      "done": false,
     },
     "34": {
       "id": "34",
@@ -1725,6 +1758,7 @@ export const ticketToRideData = {
       "fromCity": "Venezia",
       "toCity": "Constantinople",
       "value": "10",
+      "done": false,
     },
     "35": {
       "id": "35",
@@ -1733,6 +1767,7 @@ export const ticketToRideData = {
       "fromCity": "London",
       "toCity": "Wien",
       "value": "10",
+      "done": false,
     },
     "36": {
       "id": "36",
@@ -1741,6 +1776,7 @@ export const ticketToRideData = {
       "fromCity": "Athina",
       "toCity": "Wilno",
       "value": "11",
+      "done": false,
     },
     "37": {
       "id": "37",
@@ -1749,6 +1785,7 @@ export const ticketToRideData = {
       "fromCity": "Stockholm",
       "toCity": "Wien",
       "value": "11",
+      "done": false,
     },
     "38": {
       "id": "38",
@@ -1757,6 +1794,7 @@ export const ticketToRideData = {
       "fromCity": "Berlin",
       "toCity": "Moskva",
       "value": "12",
+      "done": false,
     },
     "39": {
       "id": "39",
@@ -1765,6 +1803,7 @@ export const ticketToRideData = {
       "fromCity": "Amsterdam",
       "toCity": "Wilno",
       "value": "12",
+      "done": false,
     },
     "40": {
       "id": "40",
@@ -1773,6 +1812,7 @@ export const ticketToRideData = {
       "fromCity": "Frankfurt",
       "toCity": "Smolensk",
       "value": "13",
+      "done": false,
     }
   },
   longDestinations: {
@@ -1783,6 +1823,7 @@ export const ticketToRideData = {
       "fromCity": "Lisboa",
       "toCity": "Danzig",
       "value": "20",
+      "done": false,
     },
     "42": {
       "id": "42",
@@ -1791,6 +1832,7 @@ export const ticketToRideData = {
       "fromCity": "Brest",
       "toCity": "Petrograd",
       "value": "20",
+      "done": false,
     },
     "43": {
       "id": "43",
@@ -1799,6 +1841,7 @@ export const ticketToRideData = {
       "fromCity": "Palermo",
       "toCity": "Moskva",
       "value": "20",
+      "done": false,
     },
     "44": {
       "id": "44",
@@ -1807,6 +1850,7 @@ export const ticketToRideData = {
       "fromCity": "Kobenhavn",
       "toCity": "Erzurum",
       "value": "21",
+      "done": false,
     },
     "45": {
       "id": "45",
@@ -1815,6 +1859,7 @@ export const ticketToRideData = {
       "fromCity": "Edinburgh",
       "toCity": "Athina",
       "value": "21",
+      "done": false,
     },
     "46": {
       "id": "46",
@@ -1823,6 +1868,7 @@ export const ticketToRideData = {
       "fromCity": "Cadiz",
       "toCity": "Stockholm",
       "value": "21",
+      "done": false,
     }
   }
 }

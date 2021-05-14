@@ -16,10 +16,10 @@ class Card {
         else if(this.type===2)       this.image = <img src={white} height="90" width="200" alt="Fehér vasútkocsi"></img>
         else if(this.type===3)       this.image = <img src={purple} height="90" width="200" alt="Lila vasútkocsi"></img>
         else if(this.type===4)       this.image = <img src={orange} height="90" width="200" alt="Narancssárga vasútkocsi"></img>
-        else if(this.type===5)       this.image = <img src={green} height="90" width="200" alt="Zold vasútkocsi"></img>
+        else if(this.type===5)       this.image = <img src={green} height="90" width="200" alt="Zöld vasútkocsi"></img>
         else if(this.type===6)       this.image = <img src={blue} height="90" width="200" alt="Kék vasútkocsi"></img>
         else if(this.type===7)       this.image = <img src={black} height="90" width="200" alt="Fekete vasútkocsi"></img>
-        else if(this.type===8)       this.image = <img src={locomotive} height="90" width="200" alt="Mozdony"></img>
+        else if(this.type===8)       this.image = <img src={locomotive} height="90" width="195" alt="Mozdony"></img>
     }
 }
 

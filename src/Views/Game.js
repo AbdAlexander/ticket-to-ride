@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import {useDispatch, useSelector, useStore } from "react-redux";
-import { changeText, startGame } from "../Redux/Actions/gamestateAction";
+import { changeToPlayer1, changeToPlayer2, initGame, startGame } from "../Redux/Actions/gamestateAction";
 import Backlog from "../UI/Backlog";
 import DestinationCards from "../UI/DestinitionCards";
 import GameTable from "../UI/GameTable";
@@ -23,16 +23,22 @@ const Game = () => {
     }, [store]);
     
     const [display,setDisplay] = useState('block');
+    
 
+    const cardsOnTable = [];
+    console.log(cardsOnTable);
     const startTheGame = () => {
         dispatch(startGame("STARTED"));
+        dispatch(initGame({players, cards, cardsOnTable}))
+
         setDisplay('none');
-
-        console.log("Játék kezdés")
-
-        //dispatch(gameStartint());
     }
-    
+    const clickOnPlayer1 = () => {
+        dispatch(changeToPlayer1({players}));
+    }
+    const clickOnPlayer2 = () => {
+        dispatch(changeToPlayer2({players}));
+    }
     return (
         <Container fluid>
             <h1>{gamestate?.state}</h1>
@@ -41,28 +47,16 @@ const Game = () => {
                 <Row>
                     <Col>
                         <h4>Játékosok</h4>
-                        <Player 
-                            name={players.player1.name} 
-                            points={players.player1.points}
-                            vagons={players.player1.vagons}
-                            cards={players.player1.cards}
-                            goals={players.player1.longDestinations + players.player1.normalDestinations}
-                            turns={players.player1.turns}
-                            isSelected={players.player1.isSelected}>
-                        </Player>
+                        <div onClick={clickOnPlayer1}>
+                            <Player data={players.player1}/>
+                        </div>
                         <br></br>
-                        <Player 
-                            name={players.player2.name} 
-                            points={players.player2.points}
-                            vagons={players.player2.vagons}
-                            cards={players.player2.cards}
-                            goals={players.player2.longDestinations + players.player2.normalDestinations}
-                            turns={players.player2.turns}
-                            isSelected={players.player2.isSelected}>
-                        </Player>
+                        <div onClick={clickOnPlayer2}>
+                            <Player data={players.player2}/>
+                        </div>
                     </Col>
                     <Col> <GameTable cities={gameData.cities}/> </Col>
-                    <Col> <RailwayCarrigeCards cards={cards.cardsStorage}/> </Col>
+                    <Col> <RailwayCarrigeCards cards={cards.cardsStorage} cardsOnTable={gamestate.cardsOnTable} players={players}/> </Col>
                 </Row>
                 
                 <Row>
