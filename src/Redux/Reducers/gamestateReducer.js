@@ -30,6 +30,7 @@ const initalState = {
     cardsOnTable: [],
     backlog: [],
     gamedata: ticketToRideData,
+    ldPair: [],
 };
 
 const gamestateReducer = (state = initalState, action) => { 
@@ -179,6 +180,15 @@ const gamestateReducer = (state = initalState, action) => {
             copyState.cardsOnTable.push(copyState.storage.pop());
         }
 
+        return copyState;
+    } else if(action.type === "DESTINATION_MOUSE_ENTER") {
+        copyState.ld = action.payload.dest;
+        copyState.ldPair = [];
+        copyState.ldPair.push(copyState.ld?.from);
+        copyState.ldPair.push(copyState.ld?.to);
+        return copyState;
+    } else if(action.type === "DESTINATION_MOUSE_LEAVE") {
+        copyState.ldPair = [];
         return copyState;
     }
     return state;

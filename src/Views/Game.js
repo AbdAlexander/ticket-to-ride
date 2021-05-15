@@ -10,13 +10,14 @@ import PlayerHand from "../UI/PlayerHand";
 import RailwayCarrigeCards from "../UI/RailwayCarrigeCards";
 
 const Game = () => {
+    const store = useStore();
+    const dispatch = useDispatch();
+    
     const players = useSelector((state) => state.players);
     const gameData = useSelector((state) => state.gamedata);
     const cards = useSelector((state) => state.cards);
     const gamestate = useSelector((state) => state.gamestate);
 
-    const store = useStore();
-    const dispatch = useDispatch();
 
     useEffect(() => {
         console.log(store.getState());
@@ -26,7 +27,6 @@ const Game = () => {
     
 
     const cardsOnTable = [];
-    console.log(cardsOnTable);
     const startTheGame = () => {
         dispatch(startGame("STARTED"));
         dispatch(initGame({players, cards, cardsOnTable}))
