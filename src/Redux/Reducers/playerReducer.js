@@ -20,6 +20,7 @@ const initalState = {
         doneConnections: [],
         turns: 0,
         drawCount: 0,
+        longestRoad: 0,
         color: 'green',
         isSelected: false
     },
@@ -44,6 +45,7 @@ const initalState = {
         doneConnections: [],
         turns: 0,
         drawCount: 0,
+        longestRoad: 0,
         color: 'red',
         isSelected: false
     }

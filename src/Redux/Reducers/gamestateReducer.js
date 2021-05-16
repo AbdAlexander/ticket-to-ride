@@ -1,3 +1,4 @@
+import Card from "../../Classes/Card";
 import { ticketToRideData } from "../../Utilities/Data/ticket-to-ride-data";
 
 const initalState = { 
@@ -24,6 +25,7 @@ const initalState = {
                 doneConnections: [],
                 turns: 0,
                 drawCount: 0,
+                longestRoad: 0,
                 color: 'green',
                 isSelected: false
             },
@@ -48,6 +50,7 @@ const initalState = {
                 doneConnections: [],
                 turns: 0,
                 drawCount: 0,
+                longestRoad: 0,
                 color: 'red',
                 isSelected: false
             }
@@ -57,6 +60,8 @@ const initalState = {
     backlog: [],
     gamedata: ticketToRideData,
     ldPair: [],
+    lastRound: false,
+    lastRoundCounter: 2,
 };
 
 function removeItem(arr, value, times) {
@@ -126,6 +131,7 @@ const gamestateReducer = (state = initalState, action) => {
             }
             copyState.players[player].vagons = 45;
             copyState.players[player].longDestinations.push(longDestinations.pop());
+            copyState.lastRoundCounter = 2;
         }
         copyState.players.player1.isSelected = true;
         //----------------------------------------------------------------------
@@ -178,16 +184,27 @@ const gamestateReducer = (state = initalState, action) => {
                     copyState.players.player1.isSelected = false;
                     copyState.players.player2.isSelected = true;
                     copyState.state = "Gabi köre";
+
+                    if(copyState.lastRound) copyState.lastRoundCounter--;
+
                 } else {
                     copyState.players.player1.isSelected = true;
                     copyState.players.player2.isSelected = false;
                     copyState.state = "Alex köre";
+
+                    if(copyState.lastRound) copyState.lastRoundCounter--;
                 }
             }
         }
         return copyState;
     } else if(action.type === "GET_CARD_FROM_TABLE_TO_PLAYER") {
-        copyState = action.payload;
+        copyState.cardsOnTable = action.payload.cardsOnTable;
+        copyState.actualPlayer = action.payload.actualPlayer;
+        copyState.players = action.payload.players;
+        copyState.storage = action.payload.storage;
+        copyState.chosedCard = action.payload.chosedCard;
+        copyState.backlog = action.payload.backlog;
+
         console.log(copyState.backlog);
 
         for(const card in copyState.cardsOnTable) {
@@ -207,10 +224,14 @@ const gamestateReducer = (state = initalState, action) => {
                             copyState.players.player1.isSelected = false;
                             copyState.players.player2.isSelected = true;
                             copyState.state = "Gabi köre";
+
+                            if(copyState.lastRound) copyState.lastRoundCounter--;
                         } else {
                             copyState.players.player1.isSelected = true;
                             copyState.players.player2.isSelected = false;
                             copyState.state = "Alex köre";
+
+                            if(copyState.lastRound) copyState.lastRoundCounter--;
                         }
                         break;
                     } else if(copyState.chosedCard === "Mozdony" && copyState.actualPlayer.drawCount !== 0) { 
@@ -240,10 +261,14 @@ const gamestateReducer = (state = initalState, action) => {
                                 copyState.players.player1.isSelected = false;
                                 copyState.players.player2.isSelected = true;
                                 copyState.state = "Gabi köre";
+
+                                if(copyState.lastRound) copyState.lastRoundCounter--;
                             } else {
                                 copyState.players.player1.isSelected = true;
                                 copyState.players.player2.isSelected = false;
                                 copyState.state = "Alex köre";
+
+                                if(copyState.lastRound) copyState.lastRoundCounter--;
                             }
                         }
                         break;
@@ -251,7 +276,6 @@ const gamestateReducer = (state = initalState, action) => {
                 }
             }
         }
-        console.log(copyState.backlog)
         return copyState;
     } else if(action.type === "TOO_MANY_LOCOMOTIVES") {
         copyState.storage = action.payload.storage;
@@ -338,21 +362,32 @@ const gamestateReducer = (state = initalState, action) => {
             copyState.players.player1.doneConnections.push(copyState.connection);
             copyState.players.player1.points += gotPoints;
             copyState.players.player1.vagons -= copyState.neededVagons;
+    
   
-            for(const card in copyState.players.player1.cards) {
+            for(const card in copyState.players.player1.cards) { // Elhasznált kártyák kivétele
                 if(copyState.players.player1.cards[card].color === copyState.neededColor) {
-                    //const index = copyState.players.player1.cards.indexOf(card);
-                    //copyState.players.player1.cards.splice(copyState.players.player1.cards[card],1);
                     copyState.players.player1.cards = removeItem(copyState.players.player1.cards, copyState.players.player1.cards[card], copyState.neededVagons);
+                    break;
                 }
             }
+            if(copyState.neededLocomotives > 0) { // Mozdonyok kitörlése
+                for(const card in copyState.players.player1.cards) {
+                    if(copyState.players.player1.cards[card].color === "joker") {
+                        copyState.players.player1.cards = removeItem(copyState.players.player1.cards, copyState.players.player1.cards[card], copyState.neededLocomotives);
+                    }
+                }
+            }
+            if(copyState.players.player1.longestRoad < copyState.neededVagons)
+                copyState.players.player1.longestRoad = copyState.neededVagons;
 
+            if(copyState.players.player1.vagons <= 2) 
+                copyState.lastRound = true;
 
             copyState.players.player1.isSelected = false;
             copyState.players.player2.isSelected = true;
             copyState.state = "Gabi Köre";
         } else {
-            copyState.backlog.push("Gabi sikeresen épített egy utat");
+            copyState.backlog.push(`Gabi sikeresen épített egy utat (+${gotPoints} pont)`);
             copyState.players.player2.turns++;
             copyState.players.player2.doneConnections.push(copyState.connection);
             copyState.players.player2.points += gotPoints;
@@ -360,17 +395,31 @@ const gamestateReducer = (state = initalState, action) => {
   
             for(const card in copyState.players.player2.cards) {
                 if(copyState.players.player2.cards[card].color === copyState.neededColor) {
-                    //const index = copyState.players.player1.cards.indexOf(card);
-                    //copyState.players.player1.cards.splice(copyState.players.player1.cards[card],1);
-                    //Itt vanak bajok
                     copyState.players.player2.cards = removeItem(copyState.players.player2.cards, copyState.players.player2.cards[card], copyState.neededVagons);
+                    break;
                 }
             }
+            if(copyState.neededLocomotives > 0) { // Mozdonyok kitörlése
+                for(const card in copyState.players.player2.cards) {
+                    if(copyState.players.player2.cards[card].color === "joker") {
+                        copyState.players.player2.cards = removeItem(copyState.players.player2.cards, copyState.players.player2.cards[card], copyState.neededLocomotives);
+                    }
+                }
+            }
+            if(copyState.players.player2.longestRoad < copyState.neededVagons)
+                copyState.players.player2.longestRoad = copyState.neededVagons;
+
+            if(copyState.players.player2.vagons <= 2) 
+                copyState.lastRound = true;
+           
 
             copyState.players.player1.isSelected = true;
             copyState.players.player2.isSelected = false;
             copyState.state = "Alex köre";
         }
+
+        if(copyState.lastRound) copyState.lastRoundCounter--;
+
         return copyState;
     } else if(action.type === "FAILED_BUILD") {
         copyState.backlog = action.payload.backlog;
@@ -379,6 +428,37 @@ const gamestateReducer = (state = initalState, action) => {
 
         copyState.backlog.push(copyState.actualPlayer.name + "(-nak/-nek) nem sikerül megépítenie az utat!");
         copyState.state = `${copyState.actualPlayer.name} köre`;
+
+        return copyState;
+    } else if(action.type === "CHANGE_LOCOMOTIVE_TO_RAILWAY_CARRIGE_CARD") {
+        copyState.color = action.payload.color;
+        copyState.actualPlayer = action.payload.actualPlayer;
+        copyState.answer = action.payload.answer;
+
+        for(const card in copyState.actualPlayer.cards) {
+            if(copyState.actualPlayer.cards[card].color === "joker") {
+                copyState.actualPlayer.cards = removeItem(copyState.actualPlayer.cards, copyState.actualPlayer.cards[card], copyState.answer);
+                break;
+            }
+        }
+        let type;
+        if(copyState.color==="yellow") type = 0;
+        else if(copyState.color==="red") type = 1;
+        else if(copyState.color==="white") type = 2;
+        else if(copyState.color==="purple") type = 3;
+        else if(copyState.color==="orange") type = 4;
+        else if(copyState.color==="green") type = 5;
+        else if(copyState.color==="blue") type = 6;
+        else if(copyState.color==="black") type = 7;
+
+        for(let i=0; i<copyState.answer; i++) {
+            copyState.actualPlayer.cards.push(new Card(type));
+        }
+
+        return copyState;
+    } else if(action.type === "LAST_ROUND") {
+        copyState.gamestate = action.payload.gamestate;
+        copyState.gamestate.state = "UTOLSÓ KÖR KÖVETKEZIK";
 
         return copyState;
     }

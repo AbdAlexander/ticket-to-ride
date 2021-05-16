@@ -61,3 +61,14 @@ export const failedBuild = ({backlog, actualPlayer}) => ({
     type: 'FAILED_BUILD',
     payload: {backlog: backlog, actualPlayer: actualPlayer}
 });
+
+export const changeLocomotiveToRailwayCarrigeCard = ({color,actualPlayer,answer}) => ({
+    type: 'CHANGE_LOCOMOTIVE_TO_RAILWAY_CARRIGE_CARD',
+    payload: {color:color, actualPlayer:actualPlayer, answer:answer}
+});
+
+export const lastRound = ({gamestate}) => ({
+    type: 'LAST_ROUND',
+    payload: {gamestate:gamestate}
+});
+

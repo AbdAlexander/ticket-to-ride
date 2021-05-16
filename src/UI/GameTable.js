@@ -2,7 +2,11 @@ import { Button } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import gametablepng from "../Utilities/Images/gametable.png"
-import { finishBuilding, startBuilding, finishBuildingPeriod, failedBuild } from "../Redux/Actions/gamestateAction";
+import {    finishBuilding,
+            startBuilding,
+            finishBuildingPeriod, 
+            failedBuild, 
+            changeLocomotiveToRailwayCarrigeCard } from "../Redux/Actions/gamestateAction";
 
 const MAX_WIDTH = 1050;
 const MAX_HEIGHT = 600;
@@ -75,20 +79,20 @@ const GameTable = (props) => {
             ctxTo.fillStyle = "blue";
             ctxTo.fill();
             ctxTo.stroke();
+            //setSR(true);
         }
         if(trigger) {
             setSR(false);
-            console.log(totalConnectionsFromCity);
             for(const c in totalConnectionsFromCity) {
                 for(const e in totalConnectionsFromCity[c].elements) {
                     const x = (totalConnectionsFromCity[c].elements[e].x * MAX_WIDTH) / 100;
                     const y = (totalConnectionsFromCity[c].elements[e].y * MAX_HEIGHT) / 100;
-                    const ctxFrom = canvas.current.getContext("2d");
-                    ctxFrom.beginPath();
-                    ctxFrom.arc(x,y,8,0, 2 * Math.PI);
-                    ctxFrom.fillStyle = actualPlayer.color;
-                    ctxFrom.fill();
-                    ctxFrom.stroke();
+                    const ctx = canvas.current.getContext("2d");
+                    ctx.beginPath();
+                    ctx.arc(x,y,8,0, 2 * Math.PI);
+                    ctx.fillStyle = actualPlayer.color;
+                    ctx.fill();
+                    ctx.stroke();
                 }
             }
             setTrigger(false);
@@ -149,6 +153,13 @@ const GameTable = (props) => {
                     TMPtotalConnectionsFromCity.push(connections[c]);
                 }
             }
+            if(TMPtotalConnectionsFromCity.length === 0) {
+                dispatch(failedBuild({backlog,actualPlayer}));
+                alert(`HIBA: Csak szomszédos városokat lehet összekötni!`);
+                setDisplay("none");
+                setCCT(null); setCCF(null)
+                return;
+            }
             if(TMPtotalConnectionsFromCity[0].done) {
                 dispatch(failedBuild({backlog,actualPlayer}));
                 alert("Ez az útvonal már elkészült!");
@@ -167,9 +178,6 @@ const GameTable = (props) => {
                     neededVagons++;
                 }
             }
-            console.log("Szükséges vagonok száma:" , neededVagons);
-            console.log("Szükséges szin:" , neededColor);
-            console.log("Szükséges mozdonyok: ", neededLocomotives);
 
             if(neededVagons > actualPlayer.vagons) {
                 dispatch(failedBuild({backlog,actualPlayer}));
@@ -223,18 +231,53 @@ const GameTable = (props) => {
             }
             for(const color in cardsCount) {
                 if(color === neededColor && neededVagons > cardsCount[color]) {
-                    dispatch(failedBuild({backlog,actualPlayer}));
-                    alert(`HIBA: Ez az út ${neededVagons} db ${neededColor} színű vasútkocsi-kártyát igényel, neked ${cardsCount[color]} db ${color} színűd van!`);
-                    setDisplay("none");
-                    setCCT(null); setCCF(null)
-                } else if(color === neededColor && neededVagons <= cardsCount[color]) { 
+                    if(cardsCount.joker > 0) {
+                        if(window.confirm("Neked ehhez az út megépítéséhez, nincs elég vasútkocsi-kártyád, de megpróbálhatod felhaszálni a mozdonyaidat az út megépítésére.\nSzeretnél használni mozdonyokat az út megépítéséhez?")) {
+                            let answer = prompt(`Neked összesesen ${cardsCount.joker} mozdonyod van.\nHány mozdonykártyát változtatsz át ${color} típusú vasútkocsi-kártyává?`);
+                            if(answer !== null && answer !== "" && parseInt(answer) <= cardsCount.joker) {
+                                alert(`Sikeresen átváltoztattad ${answer} mozdonyodat ${color} típusú vasútkocsi-kártyára`);
+                                cardsCount.joker -= answer; 
+                                cardsCount[color] += answer;
+                                dispatch(changeLocomotiveToRailwayCarrigeCard({color,actualPlayer,answer}));
+                                //Számosság megváltozik, illetve a kártyák is a dispatch hatására, majd a program futása folytatódik az utolsó if-nél
+    
+                            } else {
+                                dispatch(failedBuild({backlog,actualPlayer}));
+                                alert(`Hibásan válaszoltál, kérlek próbáld meg újra az építést!\nVálaszként egy számot írhatsz, és az nem lehet nagyobb, mint mozdonyaid száma`);
+                                setDisplay("none");
+                                setCCT(null); setCCF(null)
+                                return;
+                            }
+                        } else {
+                            dispatch(failedBuild({backlog,actualPlayer}));
+                            alert(`HIBA: Ez az út ${neededVagons} db ${neededColor} színű vasútkocsi-kártyát igényel, neked ${cardsCount[color]} db ${color} színűd van!`);
+                            setDisplay("none");
+                            setCCT(null); setCCF(null)
+                            return;
+                        }
+
+                    } else {
+                        dispatch(failedBuild({backlog,actualPlayer}));
+                        alert(`HIBA: Ez az út ${neededVagons} db ${neededColor} színű vasútkocsi-kártyát igényel, neked ${cardsCount[color]} db ${color} színűd van!`);
+                        setDisplay("none");
+                        setCCT(null); setCCF(null);
+                        return;
+                    }
+                }
+                if(color === neededColor && neededVagons <= cardsCount[color] && neededLocomotives <= cardsCount.joker) { 
                     setTCFC(TMPtotalConnectionsFromCity);
                     setTrigger(true);
                     setDisplay("none");
-                    dispatch(finishBuildingPeriod({players, backlog, TMPtotalConnectionsFromCity, neededColor, neededVagons, neededLocomotives, gamedata}));
+                    dispatch(finishBuildingPeriod({
+                        players, 
+                        backlog, 
+                        TMPtotalConnectionsFromCity, 
+                        neededColor, 
+                        neededVagons, 
+                        neededLocomotives, 
+                        gamedata
+                    }));
                     break;
-                    //Pontot kéne adni, felvenni egy tömböt az elkészült utakkal esetleg
-                    //Levonni a mozdonyok számát és elvenni tőle azokat a kártyákat!
                 }
             }
         }
