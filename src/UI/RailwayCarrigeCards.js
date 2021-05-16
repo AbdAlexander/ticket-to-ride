@@ -29,9 +29,16 @@ const RailwayCarrigeCards = (props) => {
     }
 
     const cardsClickHandlerer = (e) => {
+        if(gamestate.state === "Alex köre - Építkezési fázis I. (Válaszd ki a szomszédos célt!)"
+            || gamestate.state === "Alex köre - Építkezési fázis II. (Építés befejezéséhez nyomd meg a gombot)"
+            || gamestate.state === "Gabi köre - Építkezési fázis I. (Válaszd ki a szomszédos célt!)"
+            || gamestate.state === "Gabi köre - Építkezési fázis II. (Építés befejezéséhez nyomd meg a gombot)"){
+                alert("Építési fázisban nem lehet kártyát húzni!");
+                return;
+            }
 
         if(e.target.alt === "Kártyapakli" && gamestate.state !== "INITAL") {
-            dispatch(getCardFromDeckToPlayer({actualPlayer, cardsOnTable, storage, backlog}));
+            dispatch(getCardFromDeckToPlayer({actualPlayer, cardsOnTable, storage, backlog, players}));
         }
         if(e.target.tagName === 'IMG' && gamestate.state !== "INITAL") {
             console.log(e.target.alt);

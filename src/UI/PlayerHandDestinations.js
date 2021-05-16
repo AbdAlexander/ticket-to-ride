@@ -20,17 +20,21 @@ const PlayerHandDestinations = (props) => {
     const MouseLeave = (e) => {
         dispatch(destinationMouseLeave())
     }
-    const destClickHandlerer = (e) => {
-        
+    const destinationClickHandlerer = (e) => {
+        if(e.target.tagName === "STRONG") {
+            e.target.parentElement.style.border = e.target.parentElement.style.border === "" ? "1px solid" : "";
+        } else if(e.target.tagName === "LI") {
+            e.target.style.border = e.target.style.border === "" ? "1px solid" : "";
+        }
     }
-    
+
     return (
         <div>
-            <ul onClick={destClickHandlerer}>
-                <li onMouseEnter={longMouseEnter} onMouseLeave={MouseLeave}><strong>Hosszú: </strong>{long[0]?.fromCity} - {long[0]?.toCity} ({long[0]?.value}) [<strong> {long[0]?.done ? "Teljesítve" : "Teljesítetlen"} </strong>]</li>
+            <ul onClick={destinationClickHandlerer}>
+                <li key={-1} onMouseEnter={longMouseEnter} onMouseLeave={MouseLeave}><strong>Hosszú: </strong>{long[0]?.fromCity} - {long[0]?.toCity} ({long[0]?.value}) [<strong> {long[0]?.done ? "Teljesítve" : "Teljesítetlen"} </strong>]</li>
                 <div onMouseEnter={normMouseEnter} onMouseLeave={MouseLeave}>
                     {normal.map((d,i) =>
-                        <li key={i} stlye={{border: '1px solid', backgroundColor:'red'}}>
+                        <li key={i}>
                             <strong>Rövid: </strong> {d.fromCity} - {d.toCity} ({d.value})  [<strong> {d.done ? "Teljesítve" : "Teljesítetlen"} </strong>]
                         </li>)
                     }

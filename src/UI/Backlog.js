@@ -12,7 +12,7 @@ const Backlog = () => {
 
     const backlogStyle = {
         height:190,
-        width:350,
+        width:380,
         backgroundColor: "#e6e6e6", 
         borderRadius:50,
         opacity: 0.9

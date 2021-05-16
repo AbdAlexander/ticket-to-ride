@@ -11,15 +11,16 @@ import locomotive from "../Utilities/Railway_Carrrige_Cards/locomotive.png"
 class Card { 
     constructor(type) {
         this.type = type;
-        if(this.type===0)            this.image = <img src={yellow} height="90" width="200" alt="Sárga vasútkocsi"></img>
-        else if(this.type===1)       this.image = <img src={red} height="90" width="200" alt="Piros vasútkocsi"></img>
-        else if(this.type===2)       this.image = <img src={white} height="90" width="200" alt="Fehér vasútkocsi"></img>
-        else if(this.type===3)       this.image = <img src={purple} height="90" width="200" alt="Lila vasútkocsi"></img>
-        else if(this.type===4)       this.image = <img src={orange} height="90" width="200" alt="Narancssárga vasútkocsi"></img>
-        else if(this.type===5)       this.image = <img src={green} height="90" width="200" alt="Zöld vasútkocsi"></img>
-        else if(this.type===6)       this.image = <img src={blue} height="90" width="200" alt="Kék vasútkocsi"></img>
-        else if(this.type===7)       this.image = <img src={black} height="90" width="200" alt="Fekete vasútkocsi"></img>
-        else if(this.type===8)       this.image = <img src={locomotive} height="90" width="195" alt="Mozdony"></img>
+        
+        if(this.type===0)            {this.image = <img src={yellow} height="90" width="200" alt="Sárga vasútkocsi"></img>; this.color="yellow"}
+        else if(this.type===1)       {this.image = <img src={red} height="90" width="200" alt="Piros vasútkocsi"></img>; this.color="red"}
+        else if(this.type===2)       {this.image = <img src={white} height="90" width="200" alt="Fehér vasútkocsi"></img>; this.color="white"}
+        else if(this.type===3)       {this.image = <img src={purple} height="90" width="200" alt="Lila vasútkocsi"></img>; this.color="purple"}
+        else if(this.type===4)       {this.image = <img src={orange} height="90" width="200" alt="Narancssárga vasútkocsi"></img>; this.color="orange"}
+        else if(this.type===5)       {this.image = <img src={green} height="90" width="200" alt="Zöld vasútkocsi"></img>; this.color="green"}
+        else if(this.type===6)       {this.image = <img src={blue} height="90" width="200" alt="Kék vasútkocsi"></img>; this.color="blue"}
+        else if(this.type===7)       {this.image = <img src={black} height="90" width="200" alt="Fekete vasútkocsi"></img>; this.color="black"}
+        else if(this.type===8)       {this.image = <img src={locomotive} height="90" width="195" alt="Mozdony"></img>; this.color="joker"}
     }
     getSrc(type) { 
         if(type===0)            return <img src={yellow} height="135" width="160" alt="Sárga vasútkocsi"></img>

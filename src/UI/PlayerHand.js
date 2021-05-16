@@ -29,7 +29,7 @@ const PlayerHand = (props) => {
                 <Col style={{padding:0}}> <PlayerHandDestinations longD={actualPlayer.longDestinations} normalD={actualPlayer.normalDestinations}/> </Col>
                 <Col style={{display: 'flex'}}>
                     <div style={{width: '100%', display: 'flex'}}>
-                        {actualPlayer.cards.map((c,i) => <div key={i} style={{float: 'left', width:"8%"}}>{c.getSrc(c.type)}</div>)}
+                        {actualPlayer.cards.map((c,i) => <div key={i} style={{float: 'left', width:"8%"}}>{c?.getSrc(c.type)}</div>)}
                     </div>
                 </Col>
             </Row>

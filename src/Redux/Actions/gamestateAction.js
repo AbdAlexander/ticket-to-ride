@@ -17,9 +17,9 @@ export const changeToPlayer2 = ({players}) => ({
     type: 'CHANGE_TO_PLAYER2',
     payload: {players: players}
 });
-export const getCardFromDeckToPlayer = ({actualPlayer, cardsOnTable, storage, backlog}) => ({
+export const getCardFromDeckToPlayer = ({actualPlayer, cardsOnTable, storage, backlog, players}) => ({
     type: 'GET_CARD_FROM_DECK_TO_PLAYER',
-    payload: {actualPlayer: actualPlayer, cardsOnTable: cardsOnTable, storage:storage, backlog:backlog}
+    payload: {actualPlayer: actualPlayer, cardsOnTable: cardsOnTable, storage:storage, backlog:backlog, players:players}
 });
 export const getCardFromTableToPlayer = ({actualPlayer, players, cardsOnTable, storage, chosedCard, backlog}) => ({
     type: 'GET_CARD_FROM_TABLE_TO_PLAYER',
@@ -36,4 +36,28 @@ export const destinationMouseEnter = ({dest}) => ({
 export const destinationMouseLeave = () => ({
     type: 'DESTINATION_MOUSE_LEAVE',
     payload: {}
+});
+export const startBuilding = ({players}) => ({
+    type: 'START_BUILDING',
+    payload: {players:players}
+});
+export const finishBuilding = ({players}) => ({
+    type: 'FINISH_BUILDING',
+    payload: {players:players}
+});
+export const finishBuildingPeriod = ({players, backlog, TMPtotalConnectionsFromCity, neededColor, neededVagons, neededLocomotives, gamedata}) => ({
+    type: 'FINISH_BUILDING_PERIOD',
+    payload: {
+        players:players, 
+        backlog: backlog, 
+        TMPtotalConnectionsFromCity:TMPtotalConnectionsFromCity, 
+        neededColor:neededColor, 
+        neededVagons:neededVagons, 
+        neededLocomotives:neededLocomotives,
+        gamedata:gamedata
+    }
+});
+export const failedBuild = ({backlog, actualPlayer}) => ({
+    type: 'FAILED_BUILD',
+    payload: {backlog: backlog, actualPlayer: actualPlayer}
 });
