@@ -27,9 +27,7 @@ const Game = () => {
 
     useEffect(() => {
         if(gamestate) {
-            console.log("Last Round Counter: ", gamestate.lastRoundCounter , " boolean: ", gamestate.lastRound);
             if(gamestate.lastRoundCounter <= 0) {
-                console.log("Itt a játék vége!!");
                 setEndGameDisplay('none');
                 setEndGameTable('block');
             }

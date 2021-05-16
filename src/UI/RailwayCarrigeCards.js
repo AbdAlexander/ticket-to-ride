@@ -41,7 +41,6 @@ const RailwayCarrigeCards = (props) => {
             dispatch(getCardFromDeckToPlayer({actualPlayer, cardsOnTable, storage, backlog, players}));
         }
         if(e.target.tagName === 'IMG' && gamestate.state !== "INITAL") {
-            console.log(e.target.alt);
             for(const card in cardsOnTable) {
                 if(cardsOnTable[card].image.props.alt === e.target.alt) {
                     const chosedCard = e.target.alt;

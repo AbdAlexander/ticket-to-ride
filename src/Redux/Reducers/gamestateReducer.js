@@ -204,9 +204,7 @@ const gamestateReducer = (state = initalState, action) => {
         copyState.storage = action.payload.storage;
         copyState.chosedCard = action.payload.chosedCard;
         copyState.backlog = action.payload.backlog;
-
-        console.log(copyState.backlog);
-
+        
         for(const card in copyState.cardsOnTable) {
             if(copyState.cardsOnTable[card].image.props.alt === copyState.chosedCard) { //váltás ha 2x húzott
                 copyState.state = copyState.players.player1.isSelected ? "Alex köre" : "Gabi köre";

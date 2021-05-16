@@ -14,7 +14,6 @@ const PlayerHandDestinations = (props) => {
     };
     const normMouseEnter = (e) => {
         const dest = normal[e._targetInst.key];
-        console.log(dest);
         dispatch(destinationMouseEnter({dest}))
     }
     const MouseLeave = (e) => {

@@ -56,3 +56,5 @@ az fegyelmi vétségnek számít. A fegyelmi vétség legsúlyosabb következmé
 [x] Játékoldal: összegző táblázatban a leghosszabb út (1pt)
 [] 1 hét késés (-4 pont)
 [] 2 hét késés (-8 pont)
+
+<Saját számításom szerint 38 pontom lenne, természetesen megértem ha olyan buggokat találsz amit én nem vettem észre és ezért nem kapok rá pár pontot, de minden tőlem telhetőt megtettem :D>

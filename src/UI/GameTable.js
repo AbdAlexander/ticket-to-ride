@@ -59,7 +59,6 @@ const GameTable = (props) => {
                     to = cities[city];
                 }
             }
-            console.log(from, to);
 
             
             const fromX = (from?.x * MAX_WIDTH)/100;
@@ -121,7 +120,6 @@ const GameTable = (props) => {
                 const cityX = (Math.round(cities[city].x));
                 const cityY = (Math.round(cities[city].y))
                 if((cityX === x || (cityX >= x-3 && cityX <= x+3)) && (cityY === y || (cityY >= y-3 && cityY <= y+3))) {
-                    console.log("TALÁLAT " + cities[city].city);
                     setCCF(cities[city]);
                     dispatch(startBuilding({players}));
                     break;
@@ -132,10 +130,8 @@ const GameTable = (props) => {
                 const cityX = (Math.round(cities[city].x));
                 const cityY = (Math.round(cities[city].y))
                 if((cityX === x || (cityX >= x-3 && cityX <= x+3)) && (cityY === y || (cityY >= y-3 && cityY <= y+3))) {
-                    console.log("TALÁLAT " + cities[city].city);
                     setCCT(cities[city]);
                     setDisplay("block");
-                    console.log(chosedCityFrom, chosedCityTo)
                     dispatch(finishBuilding({players}))
                     break;
                 }
