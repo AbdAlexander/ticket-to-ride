@@ -7,8 +7,6 @@ const Backlog = () => {
         backlog.pop();
         backlog.reverse();
     }
-    //backlog.reverse(); //Legyen fent mindig a legutolsó lépés
-
 
     const backlogStyle = {
         height:190,

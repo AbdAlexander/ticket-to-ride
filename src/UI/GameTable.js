@@ -86,32 +86,16 @@ const GameTable = (props) => {
         }
         if(trigger) {
             setSR(false);
-            /*for(const c in totalConnectionsFromCity) {
-                for(const e in totalConnectionsFromCity[c].elements) {
-                    const x = (totalConnectionsFromCity[c].elements[e].x * MAX_WIDTH) / 100;
-                    const y = (totalConnectionsFromCity[c].elements[e].y * MAX_HEIGHT) / 100;
-                    const ctx = canvas.current.getContext("2d");
-                    ctx.beginPath();
-                    ctx.arc(x,y,8,0, 2 * Math.PI);
-                    ctx.fillStyle = actualPlayer.color;
-                    ctx.fill();
-                    ctx.stroke();
-                }
-            }*/
             setTrigger(false);
             setSR(true);
             setCCT(null);
             setCCF(null)
         }
         if(gamestate.onlinePlayers) {
-            console.log("Változás!")
             for(const p in gamestate.onlinePlayers) {
                 for(const c in gamestate.onlinePlayers[p]?.doneConnections) {
-                    console.log(gamestate.onlinePlayers[p].doneConnections[c].id);
-                    gamestate.onlinePlayers[p].doneConnections[c].map((e,i) => {
-                        //console.log(e.elements);
+                    gamestate.onlinePlayers[p].doneConnections[c].map((e) => {
                         for(const element in e.elements) {
-                            //console.log(e.elements[element]);
                             const x = (e.elements[element].x * MAX_WIDTH) / 100;
                             const y = (e.elements[element].y * MAX_HEIGHT) / 100;
                             const ctx = canvas.current.getContext("2d");
@@ -120,8 +104,7 @@ const GameTable = (props) => {
                             ctx.fillStyle = gamestate.onlinePlayers[p].color;
                             ctx.fill();
                             ctx.stroke()
-                            //console.log(x);
-                        } 
+                        }
                     });
                 }
             }
@@ -207,6 +190,7 @@ const GameTable = (props) => {
                 neededColor = TMPtotalConnectionsFromCity[c].color;
                 neededLocomotives = TMPtotalConnectionsFromCity[c].locomotive;
                 for(const e in TMPtotalConnectionsFromCity[c].elements) {
+                    console.log(e);
                     neededVagons++;
                 }
             }
@@ -221,7 +205,7 @@ const GameTable = (props) => {
         
             if(neededColor === "gray") {
                 let answer = prompt(`Ez az út ${neededVagons} db szürke vagont igényel. Melyik színű vonatkocsi-kártyákat használod el?\nBeírható színek: purple, white, blue, yellow, orange, black, red, green`);
-                if(answer == null || answer == "" 
+                if(answer === null || answer === "" 
                     || (answer !== "purple" && answer !== "white" && answer !== "white" && answer !== "blue" && answer !== "yellow" 
                         && answer !== "orange" && answer !== "black" && answer !== "red" && answer !== "green")) {
 

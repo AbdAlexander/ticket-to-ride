@@ -2,48 +2,23 @@ import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { startGameFromRoom, updateGameState } from "../Redux/Actions/gamestateAction";
+import { startGameFromRoom } from "../Redux/Actions/gamestateAction";
 import socket from "../Utilities/Socket/socket";
 
 const Waiting = () => {
-    //const [roomsInfo, setRoomsInfo] = useState(useSelector((state) => state.gamestate.roomSettings));
     const gamestate = useSelector((state) => state.gamestate);
     const [playerNames, setPlayerNames] = useState(gamestate.roomSettings.playersInRoom);
-    const [syncGameState, setSyncGameState] = useState(gamestate);
-    const [stopper, setStopper] = useState(false);
-
     const history = useHistory();
     const dispatch = useDispatch();
 
     useEffect(() => {
         if(gamestate) {
             setPlayerNames(gamestate.roomSettings.playersInRoom);
-
             if(gamestate.roomSettings.isRoomFull) {
                 history.push('game');
-                console.log("Átirányítás");
             }
         }
-    }, [gamestate]);
-
-    /*socket.on('state-changed', (msg) => {
-        let mounted = true;
-        if(msg.state.roomSettings.isRoomFull) {
-            if(msg.state.state === "INITAL") {
-                const syncState = msg.state;
-                //if(mounted) {
-                    dispatch(updateGameState({syncState}));
-                //}
-                console.log("\n\nWAITING ROOM STATE CHANGED\n\n ", stopper);
-                //setSyncGameState(msg.state);
-                history.push('game');
-            } else return;
-        } else {
-            setPlayerNames(msg.state.roomSettings.playersInRoom);
-            setSyncGameState(msg.state);
-        }
-        return () => mounted = false;
-    });*/
+    }, [gamestate, history]);
 
     const startGameListener = () => {
         if(!(playerNames.length === parseInt(gamestate.roomSettings.roomSize))) {

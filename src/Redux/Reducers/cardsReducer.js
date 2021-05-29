@@ -26,7 +26,6 @@ shuffleCards();
 
 const initalState = {cardsStorage: storage};
 const cardsReducer = (state = initalState, action) => { 
-    //let copyState = Object.assign({}, state);
 
     return state;
 };

@@ -3,7 +3,6 @@ import { destinationMouseEnter, destinationMouseLeave } from "../Redux/Actions/g
 
 const PlayerHandDestinations = (props) => {
     const dispatch = useDispatch();
-    //const connections = useSelector((state) => state.gamedata.connections);
 
     const long = props.longD;
     const normal = props.normalD;

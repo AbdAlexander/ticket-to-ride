@@ -2,29 +2,25 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import {useDispatch, useSelector, useStore } from "react-redux";
 import { useHistory } from "react-router";
-import { initGame, startGame, lastRound, updateGameState } from "../Redux/Actions/gamestateAction";
+import { initGame, lastRound } from "../Redux/Actions/gamestateAction";
 import Backlog from "../UI/Backlog";
 import DestinationCards from "../UI/DestinitionCards";
 import GameTable from "../UI/GameTable";
 import Player from "../UI/Player";
 import PlayerHand from "../UI/PlayerHand";
 import RailwayCarrigeCards from "../UI/RailwayCarrigeCards";
-import socket from "../Utilities/Socket/socket";
 
 
 const Game = () => {
     const store = useStore();
     const dispatch = useDispatch();
-    
     const cards = useSelector((state) => state.cards);
     const gamestate = useSelector((state) => state.gamestate);
-
     const [display,setDisplay] = useState('block');
     const [stopper, setStopper] = useState(true);
     const [endGameTable, setEndGameTable] = useState('none');
     const [endGameDisplay, setEndGameDisplay] = useState('block');
     const [winner, setWinner] = useState(gamestate.players.player1);
-
     const history = useHistory();
 
     useEffect(() => {
@@ -49,16 +45,16 @@ const Game = () => {
                 setDisplay('none');
             }
         }
-    }, [store, stopper, gamestate, setDisplay]);
+    }, [store, stopper, gamestate, setDisplay, dispatch]);
     
-    const cardsOnTable = [];
-
+    
     const startTheGame = () => {
-        //dispatch(startGame("STARTED"));
         const onlinePlayers = gamestate.onlinePlayers;
         dispatch(initGame({onlinePlayers, cards, cardsOnTable}))
         setDisplay('none');
     }
+    
+    const cardsOnTable = [];
     return (
         <div>
         <Container fluid style={{display: endGameDisplay}}>

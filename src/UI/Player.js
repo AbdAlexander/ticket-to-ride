@@ -1,4 +1,3 @@
-
 const Player = (props) => {
     let userData = props.data;
 
@@ -13,7 +12,6 @@ const Player = (props) => {
         backgroundColor: playerBackgroundColor,
     }
 
-    console.log("Player render lefutás sikeres");
     return (
         <div style={playerStyle}>
             <h3>{userData.name}</h3>

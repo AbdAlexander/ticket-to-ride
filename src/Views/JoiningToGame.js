@@ -6,14 +6,10 @@ import { useHistory } from "react-router";
 import { joinRoom } from "../Redux/Actions/gamestateAction";
 import { initPlayer } from "../Redux/Actions/playerAction";
 import socket from "../Utilities/Socket/socket";
-//import { useSelector } from "react-redux";
-//import { Link } from "react-router-dom";
 
 const JoiningToGame = () => {
     const [name, setName] = useState(null);
     const [roomID, setRoomID] = useState(null);
-    //const roomSize = useSelector((state) => state.gamestate.roomSettings.roomSize);
-
     const dispatch = useDispatch();
     const history = useHistory();
     
@@ -40,7 +36,6 @@ const JoiningToGame = () => {
                 alert("Hiba keletkezett, nem lehetett csatlakozni a szobához!\nHibaüzenet: " + ack.message);
             }
         })
-        console.log("RoomID: "+ roomID +"\nName: " + name);
     }
 
     return (
@@ -55,7 +50,6 @@ const JoiningToGame = () => {
                     <Form.Control placeholder="Név" onChange={(e) => setName(e.target.value)} required/> <br/>
 
                     <Button variant="success" size="lg" block onClick={joiningToGameListener}>Csatlakozás a szobához</Button>
-                    {/*<Link to="/waiting" className="btn btn-primary">Játék kezdése</Link>*/}
                 </Form.Group>
             </Form>
         </Container>

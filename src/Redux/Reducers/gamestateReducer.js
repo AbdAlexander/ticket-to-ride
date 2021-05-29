@@ -331,7 +331,6 @@ const gamestateReducer = (state = initalState, action) => {
         else if(copyState.neededVagons === 7) gotPoints = 21;
         else if(copyState.neededVagons >= 8) gotPoints = 15+copyState.neededVagons;
 
-        console.log(actualPlayer);
         if(actualPlayer.isSelected) {
             copyState.backlog.push(`${actualPlayer.name} sikeresen épített egy utat (+${gotPoints} pont)`);
             actualPlayer.turns++;
