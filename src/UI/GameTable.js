@@ -12,13 +12,14 @@ const MAX_WIDTH = 1050;
 const MAX_HEIGHT = 600;
 
 const GameTable = (props) => {
-    const gamedata = useSelector((state) => state.gamedata);
-    const cities = useSelector((state) => state.gamedata.cities);
-    const connections = useSelector((state) => state.gamedata.connections);
+    const gamedata = useSelector((state) => state.gamestate.gamedata);
+    const cities = useSelector((state) => state.gamestate.gamedata.cities);
+    const connections = useSelector((state) => state.gamestate.gamedata.connections);
     const ldPair = useSelector((state) => state.gamestate?.ldPair);
-    const players = useSelector((state) => state.gamestate?.players);
-    const gamestate = useSelector((state) => state.gamestate?.state);
+    const players = useSelector((state) => state.gamestate.onlinePlayers);
+    const gamestate = useSelector((state) => state.gamestate);
     const backlog = useSelector((state) => state.gamestate.backlog);
+    const clientName = useSelector((state) => state.clientname.name);
 
     const canvas = useRef(null);
     const [image, setImage] = useState(null);
@@ -31,9 +32,12 @@ const GameTable = (props) => {
 
     let [totalConnectionsFromCity, setTCFC] = useState([]);
 
-    let actualPlayer = players.player1;
-    if(gamestate !== "INITAL") {
-        actualPlayer = players.player1.isSelected ? players.player1 : players.player2;
+    let actualPlayer = gamestate.players.player1;
+    for(const playerIndex in players) {
+        if(players[playerIndex].name === clientName) {
+            actualPlayer = players[playerIndex];
+            break;
+        }
     }
     
     useEffect(() => {
@@ -43,7 +47,7 @@ const GameTable = (props) => {
     }, []);
 
     useEffect(() => {
-        if(image && canvas && !stopRerender) {
+        if(image && canvas) {
             const ctx = canvas.current.getContext("2d");
             ctx.drawImage(image, 0, 0);
         }
@@ -82,7 +86,7 @@ const GameTable = (props) => {
         }
         if(trigger) {
             setSR(false);
-            for(const c in totalConnectionsFromCity) {
+            /*for(const c in totalConnectionsFromCity) {
                 for(const e in totalConnectionsFromCity[c].elements) {
                     const x = (totalConnectionsFromCity[c].elements[e].x * MAX_WIDTH) / 100;
                     const y = (totalConnectionsFromCity[c].elements[e].y * MAX_HEIGHT) / 100;
@@ -93,21 +97,49 @@ const GameTable = (props) => {
                     ctx.fill();
                     ctx.stroke();
                 }
-            }
+            }*/
             setTrigger(false);
             setSR(true);
             setCCT(null);
             setCCF(null)
         }
-    }, [image,canvas,ldPair,cities,trigger, totalConnectionsFromCity, stopRerender, actualPlayer]);
+        if(gamestate.onlinePlayers) {
+            console.log("Változás!")
+            for(const p in gamestate.onlinePlayers) {
+                for(const c in gamestate.onlinePlayers[p]?.doneConnections) {
+                    console.log(gamestate.onlinePlayers[p].doneConnections[c].id);
+                    gamestate.onlinePlayers[p].doneConnections[c].map((e,i) => {
+                        //console.log(e.elements);
+                        for(const element in e.elements) {
+                            //console.log(e.elements[element]);
+                            const x = (e.elements[element].x * MAX_WIDTH) / 100;
+                            const y = (e.elements[element].y * MAX_HEIGHT) / 100;
+                            const ctx = canvas.current.getContext("2d");
+                            ctx.beginPath();
+                            ctx.arc(x,y,8,0, 2 * Math.PI);
+                            ctx.fillStyle = gamestate.onlinePlayers[p].color;
+                            ctx.fill();
+                            ctx.stroke()
+                            //console.log(x);
+                        } 
+                    });
+                }
+            }
+        }
+    }, [image,canvas,ldPair,cities,trigger, totalConnectionsFromCity, stopRerender, actualPlayer, gamestate.onlinePlayers]);
 
 
     const clickHandlerer = (e) => {
+        if(!actualPlayer.isSelected) {
+            alert("Most nem a te köröd van, így nem építkezhetsz!");
+            return;
+        }
+
         if(actualPlayer.drawCount > 0) {
             alert("Már húztál egy lapot, nem kezdhetsz neki építkezésnek!");
             return;
         }
-        if(gamestate === "INITAL") {
+        if(gamestate.state === "INITAL") {
             alert("A játék még nem kezdődött el, így építeni sem lehet!");
             return;
         }
@@ -121,7 +153,7 @@ const GameTable = (props) => {
                 const cityY = (Math.round(cities[city].y))
                 if((cityX === x || (cityX >= x-3 && cityX <= x+3)) && (cityY === y || (cityY >= y-3 && cityY <= y+3))) {
                     setCCF(cities[city]);
-                    dispatch(startBuilding({players}));
+                    dispatch(startBuilding({actualPlayer}));
                     break;
                 }
             }
@@ -132,7 +164,7 @@ const GameTable = (props) => {
                 if((cityX === x || (cityX >= x-3 && cityX <= x+3)) && (cityY === y || (cityY >= y-3 && cityY <= y+3))) {
                     setCCT(cities[city]);
                     setDisplay("block");
-                    dispatch(finishBuilding({players}))
+                    dispatch(finishBuilding({actualPlayer}))
                     break;
                 }
             }
@@ -140,6 +172,10 @@ const GameTable = (props) => {
 
     }
     const finishBuildingState = () => {
+        if(!actualPlayer.isSelected) {
+            alert("Most nem a te köröd van, így nem húzhatsz építkezhetsz vagy fejezheted be az építési fázist!");
+            return;
+        }
         
         if(chosedCityFrom != null && chosedCityTo != null) {
             let TMPtotalConnectionsFromCity = [];
@@ -265,7 +301,8 @@ const GameTable = (props) => {
                     setTrigger(true);
                     setDisplay("none");
                     dispatch(finishBuildingPeriod({
-                        players, 
+                        players,
+                        actualPlayer, 
                         backlog, 
                         TMPtotalConnectionsFromCity, 
                         neededColor, 

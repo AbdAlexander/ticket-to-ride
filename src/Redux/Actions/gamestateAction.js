@@ -4,9 +4,9 @@ export const startGame = (newGameState) => ({
         newGameState
     },
 });
-export const initGame = ({players, cards, cardsOnTable}) => ({
+export const initGame = ({onlinePlayers, cards, cardsOnTable}) => ({
     type: 'INIT_GAME',
-    payload: {players: players, cards: cards, cardsOnTable: cardsOnTable}
+    payload: {onlinePlayers: onlinePlayers, cards: cards, cardsOnTable: cardsOnTable}
     
 });
 export const changeToPlayer1 = ({players}) => ({
@@ -37,18 +37,19 @@ export const destinationMouseLeave = () => ({
     type: 'DESTINATION_MOUSE_LEAVE',
     payload: {}
 });
-export const startBuilding = ({players}) => ({
+export const startBuilding = ({actualPlayer}) => ({
     type: 'START_BUILDING',
-    payload: {players:players}
+    payload: {actualPlayer:actualPlayer}
 });
-export const finishBuilding = ({players}) => ({
+export const finishBuilding = ({actualPlayer}) => ({
     type: 'FINISH_BUILDING',
-    payload: {players:players}
+    payload: {actualPlayer:actualPlayer}
 });
-export const finishBuildingPeriod = ({players, backlog, TMPtotalConnectionsFromCity, neededColor, neededVagons, neededLocomotives, gamedata}) => ({
+export const finishBuildingPeriod = ({players, actualPlayer, backlog, TMPtotalConnectionsFromCity, neededColor, neededVagons, neededLocomotives, gamedata}) => ({
     type: 'FINISH_BUILDING_PERIOD',
     payload: {
         players:players, 
+        actualPlayer:actualPlayer,
         backlog: backlog, 
         TMPtotalConnectionsFromCity:TMPtotalConnectionsFromCity, 
         neededColor:neededColor, 
@@ -71,4 +72,20 @@ export const lastRound = ({gamestate}) => ({
     type: 'LAST_ROUND',
     payload: {gamestate:gamestate}
 });
+export const createRoom = ({roomid, roomSize, name}) => ({
+    type: 'CREATE_ROOM',
+    payload: {roomid: roomid, roomSize: roomSize, name: name}
+});
+export const joinRoom = ({syncRoomInfo, name}) => ({
+    type: 'JOIN_ROOM',
+    payload: {syncRoomInfo: syncRoomInfo, name:name}
+});
+export const startGameFromRoom = ({syncRoomInfo}) => ({
+    type: 'START_GAME_FROM_ROOM',
+    payload: {syncRoomInfo:syncRoomInfo}
+})
+export const updateGameState = ({syncState}) => ({
+    type: 'UPDATE_GAME_STATE',
+    payload: {syncState:syncState}
+})
 

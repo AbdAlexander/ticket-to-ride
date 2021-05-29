@@ -1,11 +1,12 @@
 import Card from "../../Classes/Card";
+import socket from "../../Utilities/Socket/socket";
 import { ticketToRideData } from "../../Utilities/Data/ticket-to-ride-data";
 
 const initalState = { 
     state: "INITAL", 
     players: {
             player1: {
-                name: "Alex",
+                name: "Player1",
                 points: 0,
                 vagons: 0,
                 cards: [],
@@ -30,7 +31,7 @@ const initalState = {
                 isSelected: false
             },
             player2: {
-                name: "Gabi",
+                name: "Player2",
                 points: 0,
                 vagons: 0,
                 cards: [],
@@ -62,6 +63,15 @@ const initalState = {
     ldPair: [],
     lastRound: false,
     lastRoundCounter: 2,
+
+    roomSettings: {
+        roomID: 0,
+        roomSize: 0,
+        playersInRoom: [],
+        isRoomFull: false,
+        gameStarted: false
+    },
+    onlinePlayers: [],
 };
 
 function removeItem(arr, value, times) {
@@ -81,7 +91,7 @@ const gamestateReducer = (state = initalState, action) => {
         return copyState;
 
     } else if(action.type === "INIT_GAME") {
-        copyState.players = action.payload.players;
+        copyState.onlinePlayers = action.payload.onlinePlayers;
         copyState.cards = action.payload.cards;
         copyState.cardsOnTable = action.payload.cardsOnTable;
 
@@ -112,94 +122,72 @@ const gamestateReducer = (state = initalState, action) => {
         for(let i=0; i<5; i++) {
             copyState.cardsOnTable.push(copyState.cards.cardsStorage.pop());
         }
-        for(const player in copyState.players) {
+        for(const playerIndex in copyState.onlinePlayers) {
             for(let i=0; i<4; i++) {
                 const popedCard = copyState.cards.cardsStorage.pop();
 
-                if(popedCard.color === "yellow")          { copyState.players[player].cardsVarrierty.yellow++; }
-                else if(popedCard.color === "red")        { copyState.players[player].cardsVarrierty.red++; }
-                else if(popedCard.color === "white")      { copyState.players[player].cardsVarrierty.white++; }
-                else if(popedCard.color === "purple")     { copyState.players[player].cardsVarrierty.purple++; }
-                else if(popedCard.color === "orange")     { copyState.players[player].cardsVarrierty.orange++; }
-                else if(popedCard.color === "green")      { copyState.players[player].cardsVarrierty.green++; }
-                else if(popedCard.color === "blue")       { copyState.players[player].cardsVarrierty.blue++; }
-                else if(popedCard.color === "black")      { copyState.players[player].cardsVarrierty.black++; }
-                else if(popedCard.color === "joker")      { copyState.players[player].cardsVarrierty.joker++; }
-
-                copyState.players[player].cards.push(popedCard);
-                copyState.players[player].normalDestinations.push(destinations.pop());
+                copyState.onlinePlayers[playerIndex].cards.push(popedCard);
+                copyState.onlinePlayers[playerIndex].normalDestinations.push(destinations.pop());
             }
-            copyState.players[player].vagons = 45;
-            copyState.players[player].longDestinations.push(longDestinations.pop());
+            copyState.onlinePlayers[playerIndex].vagons = 45;
+            copyState.onlinePlayers[playerIndex].longDestinations.push(longDestinations.pop());
             copyState.lastRoundCounter = 2;
         }
-        copyState.players.player1.isSelected = true;
+        copyState.onlinePlayers[0].isSelected = true;
         //----------------------------------------------------------------------
-        copyState.state = "Alex köre";
+        copyState.state = `${copyState.onlinePlayers[0].name} köre`;
+        copyState.roomSettings.gameStarted = true;
+        copyState.backlog.push("A játék elkezdődött");
+
+
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
-    } else if(action.type === "CHANGE_TO_PLAYER1") {
-        copyState.players = action.payload.players;
-
-        copyState.players.player1.isSelected = true;
-        copyState.players.player2.isSelected = false;
-
-        return copyState;
-
-    } else if(action.type === "CHANGE_TO_PLAYER2") {
-        copyState.players = action.payload.players;
-
-        copyState.players.player1.isSelected = false;
-        copyState.players.player2.isSelected = true;
-
-        return copyState;
-
     } else if(action.type === "GET_CARD_FROM_DECK_TO_PLAYER") {
-        copyState.actualPlayer = action.payload.actualPlayer;
+        const actualPlayer = action.payload.actualPlayer;
         copyState.storage = action.payload.storage;
         copyState.backlog = action.payload.backlog;
-        copyState.players = action.payload.players;
+        copyState.onlinePlayers = action.payload.players;
 
         
-        if(copyState.actualPlayer.drawCount < 2) {
+        if(actualPlayer.drawCount < 2) {
             const popedCard = copyState.storage.pop();
             
-            if(popedCard.color === "yellow")          { copyState.actualPlayer.cardsVarrierty.yellow++; }
-            else if(popedCard.color === "red")        { copyState.actualPlayer.cardsVarrierty.red++; }
-            else if(popedCard.color === "white")      { copyState.actualPlayer.cardsVarrierty.white++; }
-            else if(popedCard.color === "purple")     { copyState.actualPlayer.cardsVarrierty.purple++; }
-            else if(popedCard.color === "orange")     { copyState.actualPlayer.cardsVarrierty.orange++; }
-            else if(popedCard.color === "green")      { copyState.actualPlayer.cardsVarrierty.green++; }
-            else if(popedCard.color === "blue")       { copyState.actualPlayer.cardsVarrierty.blue++; }
-            else if(popedCard.color === "black")      { copyState.actualPlayer.cardsVarrierty.black++; }
-            else if(popedCard.color === "joker")      { copyState.actualPlayer.cardsVarrierty.joker++; }
-            
-            copyState.actualPlayer.cards.push(popedCard); 
-            copyState.actualPlayer.drawCount++;
-            copyState.backlog.push(copyState.actualPlayer.name + " húzott a pakliból");
+            actualPlayer.cards.push(popedCard); 
+            actualPlayer.drawCount++;
+            copyState.backlog.push(actualPlayer.name + " húzott a pakliból");
+            for(const playerIndex in copyState.onlinePlayers) {
+                if(actualPlayer.name === copyState.onlinePlayers[playerIndex].name) {
+                    copyState.onlinePlayers[playerIndex] = actualPlayer;
+                    break;
+                }
+            }
 
-            if(copyState.actualPlayer.drawCount === 2) {
-                copyState.actualPlayer.turns++;
-                copyState.actualPlayer.drawCount = 0;
-                if(copyState.players.player1.isSelected) {
-                    copyState.players.player1.isSelected = false;
-                    copyState.players.player2.isSelected = true;
-                    copyState.state = "Gabi köre";
+            if(actualPlayer.drawCount === 2) {
+                actualPlayer.turns++;
+                actualPlayer.drawCount = 0;
+                actualPlayer.isSelected = false;
 
-                    if(copyState.lastRound) copyState.lastRoundCounter--;
+                for(let playerIndex in copyState.onlinePlayers) {
+                    if(actualPlayer.name === copyState.onlinePlayers[playerIndex].name) {
+                        copyState.onlinePlayers[playerIndex] = actualPlayer;
 
-                } else {
-                    copyState.players.player1.isSelected = true;
-                    copyState.players.player2.isSelected = false;
-                    copyState.state = "Alex köre";
-
-                    if(copyState.lastRound) copyState.lastRoundCounter--;
+                        let nextPlayer = ++playerIndex;
+                        if(parseInt(nextPlayer) >= copyState.onlinePlayers.length) {
+                            nextPlayer = 0;
+                        }
+                        copyState.onlinePlayers[nextPlayer].isSelected = true;
+                        copyState.state = `${copyState.onlinePlayers[nextPlayer].name} köre`;
+                        if(copyState.lastRound) copyState.lastRoundCounter--;
+                        break;
+                    }
                 }
             }
         }
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "GET_CARD_FROM_TABLE_TO_PLAYER") {
+        const actualPlayer = action.payload.actualPlayer;
         copyState.cardsOnTable = action.payload.cardsOnTable;
-        copyState.actualPlayer = action.payload.actualPlayer;
         copyState.players = action.payload.players;
         copyState.storage = action.payload.storage;
         copyState.chosedCard = action.payload.chosedCard;
@@ -207,66 +195,59 @@ const gamestateReducer = (state = initalState, action) => {
         
         for(const card in copyState.cardsOnTable) {
             if(copyState.cardsOnTable[card].image.props.alt === copyState.chosedCard) { //váltás ha 2x húzott
-                copyState.state = copyState.players.player1.isSelected ? "Alex köre" : "Gabi köre";
-                if(copyState.actualPlayer.drawCount < 2) {
-                    if(copyState.chosedCard === "Mozdony" && copyState.actualPlayer.drawCount === 0) {
-                        copyState.actualPlayer.cards.push(copyState.cardsOnTable[card]);
+                //copyState.state = copyState.players.player1.isSelected ? "Alex köre" : "Gabi köre";
+                if(actualPlayer.drawCount < 2) {
+                    if(copyState.chosedCard === "Mozdony" && actualPlayer.drawCount === 0) {
+                        actualPlayer.cards.push(copyState.cardsOnTable[card]);
                         copyState.cardsOnTable[card] = copyState.storage.pop();
-                        copyState.actualPlayer.cardsVarrierty.joker++;
-                        copyState.backlog.push(copyState.actualPlayer.name + " húzott egy mozdonyt");
+                        copyState.backlog.push(actualPlayer.name + " húzott egy mozdonyt");
 
-                        copyState.actualPlayer.turns++;
-                        copyState.actualPlayer.drawCount = 0;
+                        actualPlayer.turns++;
+                        actualPlayer.drawCount = 0;
+                        actualPlayer.isSelected = false;
 
-                        if(copyState.players.player1.isSelected) {
-                            copyState.players.player1.isSelected = false;
-                            copyState.players.player2.isSelected = true;
-                            copyState.state = "Gabi köre";
+                        for(let playerIndex in copyState.onlinePlayers) {
+                            if(actualPlayer.name === copyState.onlinePlayers[playerIndex].name) {
+                                copyState.onlinePlayers[playerIndex] = actualPlayer;
 
-                            if(copyState.lastRound) copyState.lastRoundCounter--;
-                        } else {
-                            copyState.players.player1.isSelected = true;
-                            copyState.players.player2.isSelected = false;
-                            copyState.state = "Alex köre";
-
-                            if(copyState.lastRound) copyState.lastRoundCounter--;
+                                let nextPlayer = ++playerIndex;
+                                if(parseInt(nextPlayer) >= copyState.onlinePlayers.length) {
+                                    nextPlayer = 0;
+                                }
+                                copyState.onlinePlayers[nextPlayer].isSelected = true;
+                                copyState.state = `${copyState.onlinePlayers[nextPlayer].name} köre`;
+                                if(copyState.lastRound) copyState.lastRoundCounter--;
+                                break;
+                            }
                         }
                         break;
-                    } else if(copyState.chosedCard === "Mozdony" && copyState.actualPlayer.drawCount !== 0) { 
+                    } else if(copyState.chosedCard === "Mozdony" && actualPlayer.drawCount !== 0) { 
                         alert("Már húztál egy lapot! Nem húzhatsz mozdonyt!");
                         break;
                     } else {
-                        copyState.actualPlayer.cards.push(copyState.cardsOnTable[card]);
+                        actualPlayer.cards.push(copyState.cardsOnTable[card]);
                         copyState.cardsOnTable[card] = copyState.storage.pop();
-                        copyState.backlog.push(copyState.actualPlayer.name + " húzott egy vasútkocsi-kártyát");
+                        copyState.backlog.push(actualPlayer.name + " húzott egy vasútkocsi-kártyát");
 
-                        const popedCard = copyState.cardsOnTable[card];
-                        if(popedCard.color === "yellow")          { copyState.actualPlayer.cardsVarrierty.yellow++; }
-                        else if(popedCard.color === "red")        { copyState.actualPlayer.cardsVarrierty.red++; }
-                        else if(popedCard.color === "white")      { copyState.actualPlayer.cardsVarrierty.white++; }
-                        else if(popedCard.color === "purple")     { copyState.actualPlayer.cardsVarrierty.purple++; }
-                        else if(popedCard.color === "orange")     { copyState.actualPlayer.cardsVarrierty.orange++; }
-                        else if(popedCard.color === "green")      { copyState.actualPlayer.cardsVarrierty.green++; }
-                        else if(popedCard.color === "blue")       { copyState.actualPlayer.cardsVarrierty.blue++; }
-                        else if(popedCard.color === "black")      { copyState.actualPlayer.cardsVarrierty.black++; }
-                        else if(popedCard.color === "joker")      { copyState.actualPlayer.cardsVarrierty.joker++; }
+                        actualPlayer.drawCount++;
+                        if(actualPlayer.drawCount === 2) { // Váltás
+                            actualPlayer.turns++;
+                            actualPlayer.drawCount = 0;
+                            actualPlayer.isSelected = false;
 
-                        copyState.actualPlayer.drawCount++;
-                        if(copyState.actualPlayer.drawCount === 2) { // Váltás
-                            copyState.actualPlayer.turns++;
-                            copyState.actualPlayer.drawCount = 0;
-                            if(copyState.players.player1.isSelected) {
-                                copyState.players.player1.isSelected = false;
-                                copyState.players.player2.isSelected = true;
-                                copyState.state = "Gabi köre";
-
-                                if(copyState.lastRound) copyState.lastRoundCounter--;
-                            } else {
-                                copyState.players.player1.isSelected = true;
-                                copyState.players.player2.isSelected = false;
-                                copyState.state = "Alex köre";
-
-                                if(copyState.lastRound) copyState.lastRoundCounter--;
+                            for(let playerIndex in copyState.onlinePlayers) {
+                                if(actualPlayer.name === copyState.onlinePlayers[playerIndex].name) {
+                                    copyState.onlinePlayers[playerIndex] = actualPlayer;
+    
+                                    let nextPlayer = ++playerIndex;
+                                    if(parseInt(nextPlayer) >= copyState.onlinePlayers.length) {
+                                        nextPlayer = 0;
+                                    }
+                                    copyState.onlinePlayers[nextPlayer].isSelected = true;
+                                    copyState.state = `${copyState.onlinePlayers[nextPlayer].name} köre`;
+                                    if(copyState.lastRound) copyState.lastRoundCounter--;
+                                    break;
+                                }
                             }
                         }
                         break;
@@ -274,6 +255,7 @@ const gamestateReducer = (state = initalState, action) => {
                 }
             }
         }
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "TOO_MANY_LOCOMOTIVES") {
         copyState.storage = action.payload.storage;
@@ -304,33 +286,28 @@ const gamestateReducer = (state = initalState, action) => {
         copyState.ldPair = [];
         return copyState;
     } else if(action.type === "START_BUILDING") {
-        copyState.players = action.payload.players;
-
-        if(copyState.players.player1.isSelected) {
-            if(copyState.players.player1.drawCount > 0) { 
+        const actualPlayer = action.payload.actualPlayer;
+        
+        if(actualPlayer.isSelected) {
+            if(actualPlayer.drawCount > 0) {
                 alert("Már húztál egy lapot, nem kezdhetsz neki építkezésnek!");
-                return state;
+                return copyState;
             }
-            copyState.state = "Alex köre - Építkezési fázis I. (Válaszd ki a szomszédos célt!)";
-        } else {
-            if(copyState.players.player1.drawCount > 0) { 
-                alert("Már húztál egy lapot, nem kezdhetsz neki építkezésnek!");
-                return state;
-            }
-            copyState.state = "Gabi köre - Építkezési fázis I. (Válaszd ki a szomszédos célt!)";
+            copyState.state = `${actualPlayer.name} köre - Építkezési fázis I. (Válaszd ki a szomszédos célt!)`;
         }
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "FINISH_BUILDING") {
-        copyState.players = action.payload.players;
+        const actualPlayer = action.payload.actualPlayer;
 
-        if(copyState.players.player1.isSelected) {
-            copyState.state = "Alex köre - Építkezési fázis II. (Építés befejezéséhez nyomd meg a gombot)";
-        } else {
-            copyState.state = "Gabi köre - Építkezési fázis II. (Építés befejezéséhez nyomd meg a gombot)";
+        if(actualPlayer.isSelected) {
+            copyState.state = `${actualPlayer.name} köre - Építkezési fázis II. (Építés befejezéséhez nyomd meg a gombot)`;
         }
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "FINISH_BUILDING_PERIOD") {
-        copyState.players = action.payload.players;
+        const actualPlayer = action.payload.actualPlayer;
+        copyState.onlinePlayers = action.payload.players;
         copyState.backlog = action.payload.backlog;
         copyState.connection = action.payload.TMPtotalConnectionsFromCity;
         copyState.neededColor = action.payload.neededColor;
@@ -354,88 +331,69 @@ const gamestateReducer = (state = initalState, action) => {
         else if(copyState.neededVagons === 7) gotPoints = 21;
         else if(copyState.neededVagons >= 8) gotPoints = 15+copyState.neededVagons;
 
-        if(copyState.players.player1.isSelected) {
-            copyState.backlog.push(`Alex sikeresen épített egy utat (+${gotPoints} pont)`);
-            copyState.players.player1.turns++;
-            copyState.players.player1.doneConnections.push(copyState.connection);
-            copyState.players.player1.points += gotPoints;
-            copyState.players.player1.vagons -= copyState.neededVagons;
-    
-  
-            for(const card in copyState.players.player1.cards) { // Elhasznált kártyák kivétele
-                if(copyState.players.player1.cards[card].color === copyState.neededColor) {
-                    copyState.players.player1.cards = removeItem(copyState.players.player1.cards, copyState.players.player1.cards[card], copyState.neededVagons);
+        console.log(actualPlayer);
+        if(actualPlayer.isSelected) {
+            copyState.backlog.push(`${actualPlayer.name} sikeresen épített egy utat (+${gotPoints} pont)`);
+            actualPlayer.turns++;
+            actualPlayer.doneConnections.push(copyState.connection);
+            actualPlayer.points += gotPoints;
+            actualPlayer.vagons -= copyState.neededVagons;
+
+            for(const card in actualPlayer.cards) { // Elhasznált kártyák kivétele
+                if(actualPlayer.cards[card].color === copyState.neededColor) {
+                    actualPlayer.cards = removeItem(actualPlayer.cards, actualPlayer.cards[card], copyState.neededVagons);
                     break;
                 }
             }
             if(copyState.neededLocomotives > 0) { // Mozdonyok kitörlése
-                for(const card in copyState.players.player1.cards) {
-                    if(copyState.players.player1.cards[card].color === "joker") {
-                        copyState.players.player1.cards = removeItem(copyState.players.player1.cards, copyState.players.player1.cards[card], copyState.neededLocomotives);
+                for(const card in actualPlayer.cards) {
+                    if(actualPlayer.cards[card].color === "joker") {
+                        actualPlayer.cards = removeItem(actualPlayer.cards, actualPlayer.cards[card], copyState.neededLocomotives);
+                        break;
                     }
                 }
             }
-            if(copyState.players.player1.longestRoad < copyState.neededVagons)
-                copyState.players.player1.longestRoad = copyState.neededVagons;
+            if(actualPlayer.longestRoad < copyState.neededVagons)   actualPlayer.longestRoad = copyState.neededVagons;
+            if(actualPlayer.vagons <= 2)                            copyState.lastRound = true;
 
-            if(copyState.players.player1.vagons <= 2) 
-                copyState.lastRound = true;
+            actualPlayer.isSelected = false;
+            for(let playerIndex in copyState.onlinePlayers) {
+                if(actualPlayer.name === copyState.onlinePlayers[playerIndex].name) {
+                    copyState.onlinePlayers[playerIndex] = actualPlayer;
 
-            copyState.players.player1.isSelected = false;
-            copyState.players.player2.isSelected = true;
-            copyState.state = "Gabi Köre";
-        } else {
-            copyState.backlog.push(`Gabi sikeresen épített egy utat (+${gotPoints} pont)`);
-            copyState.players.player2.turns++;
-            copyState.players.player2.doneConnections.push(copyState.connection);
-            copyState.players.player2.points += gotPoints;
-            copyState.players.player2.vagons -= copyState.neededVagons;
-  
-            for(const card in copyState.players.player2.cards) {
-                if(copyState.players.player2.cards[card].color === copyState.neededColor) {
-                    copyState.players.player2.cards = removeItem(copyState.players.player2.cards, copyState.players.player2.cards[card], copyState.neededVagons);
+                    let nextPlayer = ++playerIndex;
+                    if(parseInt(nextPlayer) >= copyState.onlinePlayers.length) {
+                        nextPlayer = 0;
+                    }
+                    copyState.onlinePlayers[nextPlayer].isSelected = true;
+                    copyState.state = `${copyState.onlinePlayers[nextPlayer].name} köre`;
+                    if(copyState.lastRound) copyState.lastRoundCounter--;
                     break;
                 }
             }
-            if(copyState.neededLocomotives > 0) { // Mozdonyok kitörlése
-                for(const card in copyState.players.player2.cards) {
-                    if(copyState.players.player2.cards[card].color === "joker") {
-                        copyState.players.player2.cards = removeItem(copyState.players.player2.cards, copyState.players.player2.cards[card], copyState.neededLocomotives);
-                    }
-                }
-            }
-            if(copyState.players.player2.longestRoad < copyState.neededVagons)
-                copyState.players.player2.longestRoad = copyState.neededVagons;
-
-            if(copyState.players.player2.vagons <= 2) 
-                copyState.lastRound = true;
-           
-
-            copyState.players.player1.isSelected = true;
-            copyState.players.player2.isSelected = false;
-            copyState.state = "Alex köre";
         }
-
         if(copyState.lastRound) copyState.lastRoundCounter--;
 
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "FAILED_BUILD") {
         copyState.backlog = action.payload.backlog;
-        copyState.actualPlayer = action.payload.actualPlayer;
+        const actualPlayer = action.payload.actualPlayer;
         
 
-        copyState.backlog.push(copyState.actualPlayer.name + "(-nak/-nek) nem sikerül megépítenie az utat!");
-        copyState.state = `${copyState.actualPlayer.name} köre`;
+        copyState.backlog.push(actualPlayer.name + "(-nak/-nek) nem sikerült megépítenie az utat!");
+        copyState.state = `${actualPlayer.name} köre`;
 
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "CHANGE_LOCOMOTIVE_TO_RAILWAY_CARRIGE_CARD") {
+        const actualPlayer = action.payload.actualPlayer;
         copyState.color = action.payload.color;
-        copyState.actualPlayer = action.payload.actualPlayer;
         copyState.answer = action.payload.answer;
 
-        for(const card in copyState.actualPlayer.cards) {
-            if(copyState.actualPlayer.cards[card].color === "joker") {
-                copyState.actualPlayer.cards = removeItem(copyState.actualPlayer.cards, copyState.actualPlayer.cards[card], copyState.answer);
+        for(const card in actualPlayer.cards) {
+            if(actualPlayer.cards[card].color === "joker") {
+                actualPlayer.cards = removeItem(actualPlayer.cards, actualPlayer.cards[card], copyState.answer);
                 break;
             }
         }
@@ -450,14 +408,61 @@ const gamestateReducer = (state = initalState, action) => {
         else if(copyState.color==="black") type = 7;
 
         for(let i=0; i<copyState.answer; i++) {
-            copyState.actualPlayer.cards.push(new Card(type));
+            actualPlayer.cards.push(new Card(type));
         }
-
+        for(let playerIndex in copyState.onlinePlayers) {
+            if(actualPlayer.name === copyState.onlinePlayers[playerIndex].name) {
+                copyState.onlinePlayers[playerIndex] = actualPlayer;
+                break;
+            }
+        }
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
         return copyState;
     } else if(action.type === "LAST_ROUND") {
         copyState.gamestate = action.payload.gamestate;
         copyState.gamestate.state = "UTOLSÓ KÖR KÖVETKEZIK";
 
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
+        return copyState;
+    } else if(action.type === "CREATE_ROOM") {
+        copyState.roomSettings.roomID = action.payload.roomid;
+        copyState.roomSettings.roomSize = action.payload.roomSize;
+        copyState.roomSettings.playersInRoom.push(action.payload.name);
+
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, true, (ack) => {})
+        return copyState;
+    } else if(action.type === "JOIN_ROOM") {
+        copyState.roomSettings = action.payload.syncRoomInfo;
+        copyState.roomSettings.playersInRoom.push(action.payload.name);
+
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, true, (ack) => {})
+        return copyState;
+    } else if(action.type === "START_GAME_FROM_ROOM") {
+        copyState.roomSettings = action.payload.syncRoomInfo;
+        copyState.roomSettings.isRoomFull = true;
+        
+        const colors = ['red','green','yellow','black','blue'];
+        for(const playerIndex in copyState.roomSettings.playersInRoom) {
+            const player = {
+                name: copyState.roomSettings.playersInRoom[playerIndex],
+                points: 0,
+                vagons: 0,
+                cards: [],
+                longDestinations: [],
+                normalDestinations: [],
+                doneConnections: [],
+                turns: 0,
+                drawCount: 0,
+                longestRoad: 0,
+                color: colors[playerIndex],
+                isSelected: false
+            }
+            copyState.onlinePlayers.push(player);
+        }
+        socket.emit('sync-state', copyState.roomSettings.roomID, copyState, false, (ack) => {})
+        return copyState;
+    } else if(action.type === "UPDATE_GAME_STATE") {
+        copyState = action.payload.syncState;
         return copyState;
     }
     return state;

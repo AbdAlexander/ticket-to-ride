@@ -7,13 +7,14 @@ import cardsReducer from "./Reducers/cardsReducer";
 import gamedataReducer from "./Reducers/gamedataReducer";
 import playerReducer from "./Reducers/playerReducer";
 import gamestateReducer from "./Reducers/gamestateReducer";
+import clientnameReducer from "./Reducers/clientnameReducer";
 
 const reducers = combineReducers({
     gamestate: gamestateReducer,
     gamedata: gamedataReducer,
     players: playerReducer,
     cards: cardsReducer,
-
+    clientname: clientnameReducer,
 });
 const logger = createLogger({ collapsed: true  });
 

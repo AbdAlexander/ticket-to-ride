@@ -1,57 +1,63 @@
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import {useDispatch, useSelector, useStore } from "react-redux";
-import { Link } from "react-router-dom";
-import { changeToPlayer1, changeToPlayer2, initGame, startGame, lastRound } from "../Redux/Actions/gamestateAction";
+import { useHistory } from "react-router";
+import { initGame, startGame, lastRound, updateGameState } from "../Redux/Actions/gamestateAction";
 import Backlog from "../UI/Backlog";
 import DestinationCards from "../UI/DestinitionCards";
 import GameTable from "../UI/GameTable";
 import Player from "../UI/Player";
 import PlayerHand from "../UI/PlayerHand";
 import RailwayCarrigeCards from "../UI/RailwayCarrigeCards";
+import socket from "../Utilities/Socket/socket";
 
 
 const Game = () => {
     const store = useStore();
     const dispatch = useDispatch();
     
-    const players = useSelector((state) => state.players);
-    const gameData = useSelector((state) => state.gamedata);
     const cards = useSelector((state) => state.cards);
     const gamestate = useSelector((state) => state.gamestate);
 
     const [display,setDisplay] = useState('block');
-    const [endGameDisplay,setEndGameDisplay] = useState('block');
-    const [endGameTable,setEndGameTable] = useState('none');
     const [stopper, setStopper] = useState(true);
+    const [endGameTable, setEndGameTable] = useState('none');
+    const [endGameDisplay, setEndGameDisplay] = useState('block');
+    const [winner, setWinner] = useState(gamestate.players.player1);
+
+    const history = useHistory();
 
     useEffect(() => {
         if(gamestate) {
             if(gamestate.lastRoundCounter <= 0) {
                 setEndGameDisplay('none');
                 setEndGameTable('block');
+
+                let maxGainedPoint = 0;
+                for(const playerIndex in gamestate.onlinePlayers) {
+                    if(gamestate.onlinePlayers[playerIndex].points > maxGainedPoint) {
+                        maxGainedPoint = gamestate.onlinePlayers[playerIndex].points;
+                        setWinner(gamestate.onlinePlayers[playerIndex]);
+                    }
+                }
             }
             if(gamestate.lastRound && stopper) {
                 dispatch(lastRound({gamestate}));
                 setStopper(false);
             }
+            if(gamestate.roomSettings.gameStarted) {
+                setDisplay('none');
+            }
         }
-    }, [store, gamestate, stopper]);
+    }, [store, stopper, gamestate, setDisplay]);
     
-    
-
     const cardsOnTable = [];
-    const startTheGame = () => {
-        dispatch(startGame("STARTED"));
-        dispatch(initGame({players, cards, cardsOnTable}))
 
+    const startTheGame = () => {
+        //dispatch(startGame("STARTED"));
+        const onlinePlayers = gamestate.onlinePlayers;
+        dispatch(initGame({onlinePlayers, cards, cardsOnTable}))
         setDisplay('none');
-    }
-    const clickOnPlayer1 = () => {
-        dispatch(changeToPlayer1({players}));
-    }
-    const clickOnPlayer2 = () => {
-        dispatch(changeToPlayer2({players}));
     }
     return (
         <div>
@@ -62,21 +68,22 @@ const Game = () => {
                 <Row>
                     <Col>
                         <h4>Játékosok</h4>
-                        <div onClick={clickOnPlayer1}>
-                            <Player data={players.player1}/>
-                        </div>
-                        <br></br>
-                        <div onClick={clickOnPlayer2}>
-                            <Player data={players.player2}/>
+                        <div>
+                            {gamestate?.onlinePlayers?.map((playerData,key) => <div key={key}> <Player data={playerData}/> <br></br> </div>)}
                         </div>
                     </Col>
-                    <Col> <GameTable cities={gameData.cities}/> </Col>
-                    <Col> <RailwayCarrigeCards cards={cards.cardsStorage} cardsOnTable={gamestate.cardsOnTable} players={players} style={{display: endGameDisplay}}/> </Col>
+                    <Col> <GameTable cities={gamestate.gamedata.cities}/> </Col>
+                    <Col> {<RailwayCarrigeCards 
+                            cards={gamestate.cards.cardsStorage} 
+                            cardsOnTable={gamestate?.cardsOnTable} 
+                            players={gamestate.onlinePlayers} 
+                            style={{display:'block'}}/>}
+                    </Col>
                 </Row>
                 
                 <Row>
                     <Col> <Backlog/> </Col>
-                    <Col> <PlayerHand style={{display: endGameDisplay}} /> </Col>
+                    <Col> {<PlayerHand style={{display: endGameDisplay}} gamestate={gamestate} />} </Col>
                     <Col><DestinationCards style={{display: endGameDisplay}}/></Col>
                 </Row>
             </div>
@@ -84,36 +91,17 @@ const Game = () => {
 
         <Container fluid style={{display: endGameTable}}>
             <h1>Ez itt a játék vége!</h1>
-            <div style={{border:'2px solid', backgroundColor:"#F9F25C"}}>
-                <h2>Győztes: {players?.player1?.points > players?.player2?.points ? players?.player1?.name : players?.player2?.name}</h2>
+            <div style={{border:'2px solid', backgroundColor:"#F9F25C", opacity:0.93, borderRadius:10}}>
+                <h2>Győztes: {winner.name}</h2>
                 <h3>Játékosok: </h3>
-                <Player data={players?.player1}/>
-                <Player data={players?.player2}/>
-                <h2>Leghosszabb megépített út: {players.player1?.longestRoad > players.player2?.longestRoad ? players.player2?.longestRoad : players.player2?.longestRoad} egység hosszú volt, amit {players.player1.longestRoad > players.player2.longestRoad ? players.player1.name : players.player2.name} épített</h2> 
+                {gamestate?.onlinePlayers?.map((playerData,key) => <div key={key}> <Player data={playerData}/> </div>)}
+                <h2>Leghosszabb megépített út: {winner.longestRoad} egység hosszú volt, amit {winner.name} épített</h2> 
                 <br></br>
-                <h4>{players.player1.name} céljai</h4>
-                <ol>
-                   <li style={{color: players.player1.longDestinations[0]?.done ? "green" : "red"}}>Hosszú: {players.player1.longDestinations[0]?.fromCity} - {players.player1.longDestinations[0]?.toCity}</li>
-                   {players.player1?.normalDestinations?.map((d,i) =>
-                        <li key={i} style={{color: players.player1.longDestinations[0]?.done ? "green" : "red"}}>
-                            Rövid: {d?.fromCity} - {d?.toCity}
-                        </li>)
-                    }
-                </ol>
-                <h4>{players.player2.name} céljai</h4>
-                <ol>
-                   <li style={{color: players.player2.longDestinations[0]?.done ? "green" : "red"}}>Hosszú: {players.player2.longDestinations[0]?.fromCity} - {players.player2.longDestinations[0]?.toCity}</li>
-                   {players.player2.normalDestinations?.map((d,i) =>
-                        <li key={i} style={{color: players.player2.longDestinations[0]?.done ? "green" : "red"}}>
-                            Rövid: {d?.fromCity} - {d?.toCity}
-                        </li>)
-                    }
-                </ol>
-                <Link to="/" className="btn btn-primary" onClick={() => window.location.reload(false)}>Új játék indítása</Link>
+                <Button variant="success" size="lg" block onClick={() => history.push('/')}>Vissza a főoldalra</Button>
 
             </div>
         </Container>
-        </div>
+    </div>
     );
 };
 export default Game;
